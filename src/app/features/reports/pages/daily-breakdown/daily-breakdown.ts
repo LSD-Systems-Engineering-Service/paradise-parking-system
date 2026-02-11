@@ -4,7 +4,7 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 
 import { DateTime } from 'luxon';
-import { Banknote, Car, Clock, LucideAngularModule, Motorbike } from 'lucide-angular';
+import { Banknote, Car, Clock, LucideAngularModule, Motorbike, Truck } from 'lucide-angular';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -48,6 +48,7 @@ export class DailyBreakdown {
   readonly Car = Car;
   readonly Clock = Clock;
   readonly Motorbike = Motorbike;
+  readonly Truck = Truck;
 
   private parkingService = inject(ParkingService);
   private destroy$ = new Subject<void>();
@@ -60,7 +61,7 @@ export class DailyBreakdown {
   readonly date = new FormControl(DateTime.now(), { nonNullable: true });
   dateToday = this.date.value.toFormat('yyyy-MM-dd');
 
-  readonly COLUMNS: string[] = ['plateNumber', 'vehicleType', 'enteredAt', 'exitedAt', 'duration', 'fee', 'status', 'actions'] as const;
+  readonly COLUMNS: string[] = ['vehicleType', 'plateNumber', 'enteredAt', 'exitedAt', 'duration', 'fee', 'status', 'actions'] as const;
   dataSource = new MatTableDataSource<any>([]);
 
   stats: ParkingStatistics | null = null;

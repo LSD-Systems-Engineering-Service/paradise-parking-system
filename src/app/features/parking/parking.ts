@@ -1,3 +1,4 @@
+
 import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -55,7 +56,7 @@ export class Parking {
   readonly ellipsisVertical = EllipsisVertical;
 
   readonly ACTIVE_SESSION_COLUMNS: string[] = ['vehicleType', 'plateNumber', 'enteredAt', 'status', 'actions'] as const;
-  readonly EXITED_SESSION_COLUMNS: string[] = ['vehicleType', 'plateNumber', 'enteredAt', 'exitedAt', 'duration', 'fee', 'status'] as const;
+  readonly EXITED_SESSION_COLUMNS: string[] = ['vehicleType', 'plateNumber', 'enteredAt', 'exitedAt', 'duration', 'fee', 'status', 'actions'] as const;
 
   @ViewChild('activeSessionsPaginator') activeSessionsPaginator!: MatPaginator;
   @ViewChild('exitedSessionsPaginator') exitedSessionsPaginator!: MatPaginator;
@@ -154,7 +155,7 @@ export class Parking {
     })
   }
 
-    exitSession(element: any): void {
+  exitSession(element: any): void {
     const dialogRef = this.dialog.open(ExitConfirmationDialog, {
       data: element
     });
@@ -174,6 +175,31 @@ export class Parking {
           this.snackBar.open(error.message, "Okay");
         }
       })
+    })
+  }
+
+  handleRetryEntryPrint(sessionId: string): void {
+    this.parkingService.retryPrintEntryTicket(sessionId).subscribe({
+      next: (response) => {
+        this.snackBar.open(PARKING_MESSAGES.PRINT_SUCCESS, 'Close');
+      },
+      error: (error) => {
+        console.log('Print Service not available', error)
+        this.snackBar.open(error.message, "Okay")
+      }
+    })
+  }
+
+  handleRetryExitPrint(sessionId: string): void {
+    console.log(sessionId)
+    this.parkingService.retryPrintExitTicket(sessionId).subscribe({
+      next: (response) => {
+        this.snackBar.open(PARKING_MESSAGES.PRINT_SUCCESS, 'Close');
+      },
+      error: (error) => {
+        console.log('Print Service not available', error)
+        this.snackBar.open(error.message, "Okay")
+      }
     })
   }
 

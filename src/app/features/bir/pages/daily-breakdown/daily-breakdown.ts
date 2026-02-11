@@ -3,7 +3,7 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { DateTime } from 'luxon';
-import { Banknote, Car, Clock, LucideAngularModule, Motorbike } from 'lucide-angular';
+import { Banknote, Car, Clock, LucideAngularModule, Motorbike, Truck } from 'lucide-angular';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -16,7 +16,6 @@ import { DatePipe, NgClass } from '@angular/common';
 import { formatMinutes } from '../../../../shared/utils/time-format';
 import { ParkingService } from '../../../parking/services/parking.service';
 import { ParkingStatistics } from '../../../../../graphql/generated/graphql';
-
 
 @Component({
   selector: 'app-daily-breakdown',
@@ -40,6 +39,7 @@ export class BIRDailyBreakdown {
   readonly Car = Car;
   readonly Clock = Clock;
   readonly Motorbike = Motorbike;
+  readonly Truck = Truck;
 
   private parkingService = inject(ParkingService);
   private destroyRef = inject(DestroyRef);
@@ -47,7 +47,7 @@ export class BIRDailyBreakdown {
 
   formatMinutes = formatMinutes;
 
-  readonly COLUMNS: string[] = ['plateNumber', 'vehicleType', 'enteredAt', 'exitedAt', 'duration', 'fee', 'status'] as const;
+  readonly COLUMNS: string[] = ['vehicleType', 'plateNumber', 'enteredAt', 'exitedAt', 'duration', 'fee', 'status'] as const;
   dataSource = new MatTableDataSource<any>([]);
 
   stats: ParkingStatistics | null = null;

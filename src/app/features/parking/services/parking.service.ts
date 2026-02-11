@@ -1,8 +1,22 @@
 import { inject, Injectable } from '@angular/core';
-import { Apollo } from 'apollo-angular';
 import { map, Observable } from 'rxjs';
+
+import { Apollo } from 'apollo-angular';
+import { HttpClient } from '@angular/common/http';
+
 import { PaginatedResponse } from '../../../shared/types/paginated-response.type';
-import { CreateParkingSessionDocument, ExitParkingSessionDocument, GetParkingSessionsDocument, GetParkingSessionsQuery, GetParkingSessionsQueryVariables, GetParkingStatisticsDocument, GetParkingStatisticsQuery, GetParkingStatisticsQueryVariables, ParkingSession } from '../../../../graphql/generated/graphql';
+import { 
+  CreateParkingSessionDocument, 
+  ExitParkingSessionDocument, 
+  GetParkingSessionsDocument, 
+  GetParkingSessionsQuery, 
+  GetParkingSessionsQueryVariables, 
+  GetParkingStatisticsDocument, 
+  GetParkingStatisticsQuery, 
+  GetParkingStatisticsQueryVariables, 
+  ParkingSession 
+} from '../../../../graphql/generated/graphql';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +24,8 @@ import { CreateParkingSessionDocument, ExitParkingSessionDocument, GetParkingSes
 
 export class ParkingService {
   private apollo = inject(Apollo);
+  readonly http = inject(HttpClient);
+  readonly baseUrl = environment.apiBaseUrl;
 
   getParkingSessions(
     variables: GetParkingSessionsQueryVariables
@@ -85,5 +101,13 @@ export class ParkingService {
       variables,
       fetchPolicy: 'network-only'
     })
+  }
+
+  retryPrintEntryTicket(sessionId: string) {
+    return this.http.post(`${this.baseUrl}/print/retry/entry/${sessionId}`, {})
+  }
+
+  retryPrintExitTicket(sessionId: string) {
+    return this.http.post(`${this.baseUrl}/print/retry/exit/${sessionId}`, {})
   }
 }
