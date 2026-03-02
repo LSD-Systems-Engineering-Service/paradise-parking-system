@@ -35,6 +35,7 @@ export class ParkingEntryForm {
   entryForm: FormGroup = this.fb.group({
     vehicleType: ['', Validators.required],
     plateNumber: ['', Validators.required],
+    rateType: ['HOURLY', Validators.required]
     // discountType: ['NONE'],
     // discountHolderName: [''],
     // discountIdNumber: [''],
@@ -75,7 +76,6 @@ export class ParkingEntryForm {
     }
   }
 
-
   now$: Observable<Date> = interval(1000).pipe(
     startWith(0),
     map(() => new Date())
@@ -84,7 +84,7 @@ export class ParkingEntryForm {
   onSubmit() {
     if (this.entryForm.invalid) return;
     this.isSubmitting = true;
-    console.log(this.entryForm);
+    console.log(this.entryForm.value);
 
     this.parkingService.createParkingSession(this.entryForm.value, getTodayISO()).pipe(
       finalize(() => {

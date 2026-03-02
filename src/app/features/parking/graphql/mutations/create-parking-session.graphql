@@ -1,5 +1,5 @@
 mutation CreateParkingSession($input: CreateParkingSessionInput!) {
-  createParkingSession(input: $input) {
+  CreateParkingSession(input: $input) {
     id
     vehicleType
     plateNumber

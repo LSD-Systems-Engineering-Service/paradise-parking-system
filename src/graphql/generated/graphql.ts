@@ -21,12 +21,13 @@ export type Scalars = {
 
 export type CreateParkingSessionInput = {
   plateNumber: Scalars['String']['input'];
+  rateType: Scalars['String']['input'];
   vehicleType: Scalars['String']['input'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createParkingSession: ParkingSession;
+  CreateParkingSession: ParkingSession;
   exitParkingSession: ParkingSession;
   includeParkingSessionInBIR: ParkingSession;
 };
@@ -75,6 +76,7 @@ export type ParkingSession = {
   parkingState: ParkingState;
   paymentStatus: PaymentStatus;
   plateNumber: Scalars['String']['output'];
+  rateType: RateType;
   vehicleModel?: Maybe<Scalars['String']['output']>;
   vehicleType: VehicleType;
 };
@@ -134,6 +136,12 @@ export type QueryVehicleStatsArgs = {
   date: Scalars['DateTime']['input'];
 };
 
+export enum RateType {
+  Hourly = 'HOURLY',
+  Monthly = 'MONTHLY',
+  Overnight = 'OVERNIGHT'
+}
+
 export type VehicleStats = {
   __typename?: 'VehicleStats';
   name: Scalars['String']['output'];
@@ -151,7 +159,7 @@ export type CreateParkingSessionMutationVariables = Exact<{
 }>;
 
 
-export type CreateParkingSessionMutation = { __typename?: 'Mutation', createParkingSession: { __typename?: 'ParkingSession', id: string, vehicleType: VehicleType, plateNumber: string, enteredAt: any, paymentStatus: PaymentStatus, parkingState: ParkingState } };
+export type CreateParkingSessionMutation = { __typename?: 'Mutation', CreateParkingSession: { __typename?: 'ParkingSession', id: string, vehicleType: VehicleType, plateNumber: string, enteredAt: any, paymentStatus: PaymentStatus, parkingState: ParkingState } };
 
 export type ExitParkingSessionMutationVariables = Exact<{
   id: Scalars['String']['input'];
@@ -189,7 +197,7 @@ export type IncludeParkingSessionInBirMutation = { __typename?: 'Mutation', incl
 
 export const CreateParkingSessionDocument = gql`
     mutation CreateParkingSession($input: CreateParkingSessionInput!) {
-  createParkingSession(input: $input) {
+  CreateParkingSession(input: $input) {
     id
     vehicleType
     plateNumber
