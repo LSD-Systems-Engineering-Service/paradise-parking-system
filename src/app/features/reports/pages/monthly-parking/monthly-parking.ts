@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { provideLuxonDateAdapter } from '@angular/material-luxon-adapter';
 import { DateTime } from 'luxon';
 import { Banknote, Car, Clock, LucideAngularModule, Motorbike } from 'lucide-angular';
 
@@ -17,8 +16,11 @@ import { NgxEchartsDirective } from 'ngx-echarts';
 import type { ECharts } from 'echarts/core';
 import { Button } from "../../../../shared/ui/button/button";
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { AddMonthlyDialog } from '../../components/add-monthly-dialog/add-monthly-dialog';
+import { ParkingService } from '../../../parking/services/parking.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ParkingSession } from '../../../../../graphql/generated/graphql';
 
 
 @Component({
@@ -35,8 +37,9 @@ import { AddMonthlyDialog } from '../../components/add-monthly-dialog/add-monthl
     NgClass,
     NgxEchartsDirective,
     Button,
-    MatCheckboxModule
-],
+    MatCheckboxModule,
+    DatePipe
+  ],
   templateUrl: './monthly-parking.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -49,6 +52,15 @@ export class MonthlyParking {
 
   readonly date = new FormControl(DateTime.now());
   private dialog = inject(MatDialog);
+  private destroyRef = inject(DestroyRef);
+  private parkingService = inject(ParkingService);
+
+  readonly COLUMNS: string[] = ['vehicleType', 'plateNumber', 'availedAt', 'expiresAt', 'amountPaid', 'status'] as const;
+  dataSource = new MatTableDataSource<any>([]);
+
+  ngOnInit(): void {
+    this.loadMonthlyRecords();
+  }
 
   addVehicle() {
     const dialogRef = this.dialog.open(AddMonthlyDialog);
@@ -84,15 +96,28 @@ export class MonthlyParking {
     ]
   };
 
+  loadMonthlyRecords() {
+    this.parkingService.getMonthlySessions({
+      page: 1,
+      limit: 10,
+      rateType: "MONTHLY"
+    }).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (response) => {
+        this.dataSource.data = response.data;
+        console.log(response);
+      },
+      error: (err) => {
+        console.error('Error loading monthly records:', err);
+      }
+    })
+  }
+
   onChartInit(e: ECharts) {
     this.chartInstance = e;
     console.log('on chart init:', e);
   }
 
-  readonly COLUMNS: string[] = ['plateNumber', 'vehicleType', 'availedAt', 'expiresAt', 'duration', 'fee', 'status'] as const;
-  dataSource = new MatTableDataSource<any>(['TEST-PARK-MONTH']);
-
-  ngOnInit(): void {
-    console.log(this.date.value);
-  }
+  
 }

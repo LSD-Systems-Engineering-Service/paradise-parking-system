@@ -1,0 +1,28 @@
+query MonthlySessions(
+    $page: Int!
+    $limit: Int!
+    $rateType: String!
+) {
+    monthlySessions(page: $page, limit: $limit, rateType: $rateType) {
+        data {
+            id
+            vehicleType
+            plateNumber
+            enteredAt
+            exitedAt
+            durationMinutes
+            parkingFee
+            parkingState
+            paymentStatus
+            rateType
+            includeInBIRReport
+            monthlyStart
+            monthlyEnd
+        }
+        meta {
+            total
+            page
+            totalPages
+        }
+    }
+}

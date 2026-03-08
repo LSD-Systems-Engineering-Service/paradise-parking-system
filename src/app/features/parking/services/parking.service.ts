@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { PaginatedResponse } from '../../../shared/types/paginated-response.type';
 import { 
+  CreateMonthlySessionDocument,
   CreateParkingSessionDocument, 
   ExitParkingSessionDocument, 
   GetParkingSessionsDocument, 
@@ -14,6 +15,9 @@ import {
   GetParkingStatisticsDocument, 
   GetParkingStatisticsQuery, 
   GetParkingStatisticsQueryVariables, 
+  MonthlySessionsDocument, 
+  MonthlySessionsQuery, 
+  MonthlySessionsQueryVariables, 
   ParkingSession 
 } from '../../../../graphql/generated/graphql';
 import { environment } from '../../../../environments/environment';
@@ -47,7 +51,7 @@ export class ParkingService {
             meta: { total: 0, page: 0, limit: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false }
           };
         }
-
+        
         return {
           data: (raw.data || []) as ParkingSession[],
           meta: raw.meta
@@ -73,6 +77,48 @@ export class ParkingService {
     })
   }
 
+  createMonthlySession(input: any) {
+    return this.apollo.mutate({
+      mutation: CreateMonthlySessionDocument,
+      variables: { input },
+      refetchQueries: [
+        {
+          query: MonthlySessionsDocument,
+          variables: { rateType: "MONTHLY", page: 1, limit: 10 }
+        }
+      ],
+    })
+  }
+
+  getMonthlySessions(
+    variables: MonthlySessionsQueryVariables
+  ): Observable<PaginatedResponse<ParkingSession>> {
+    return this.apollo
+      .watchQuery<MonthlySessionsQuery, MonthlySessionsQueryVariables>({
+        query: MonthlySessionsDocument,
+        variables,
+        fetchPolicy: 'network-only',
+      })
+      .valueChanges
+      .pipe(
+      map(result => {
+        const raw = result.data?.monthlySessions;
+
+        if (!raw) {
+          return {
+            data: [] as ParkingSession[],
+            meta: { total: 0, page: 0, limit: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false }
+          };
+        }
+        
+        return {
+          data: (raw.data || []) as ParkingSession[],
+          meta: raw.meta
+        } as PaginatedResponse<ParkingSession>;
+      })
+    );
+  }
+  
   exitParkingSession(id: string, date: string) {
     return this.apollo.mutate({
       mutation: ExitParkingSessionDocument,

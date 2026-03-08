@@ -1,5 +1,5 @@
-mutation CreateParkingSession($input: CreateParkingSessionInput!) {
-    createParkingSession(input: $input) {
+mutation CreateMonthlySession($input: CreateMonthlySessionInput!) {
+    createMonthlySession(input: $input) {
         id
         vehicleType
         plateNumber

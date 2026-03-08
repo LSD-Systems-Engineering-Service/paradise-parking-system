@@ -15,38 +15,34 @@
   <h2 class="text-2xl font-semibold mt-6">Monthly Paid Vehicles</h2>
   <div class="w-full overflow-x-auto bg-white rounded-lg shadow-sm border border-slate-200 mt-2">
     <table cdk-table [dataSource]="dataSource" class="w-full border-collapse">
-      <ng-container cdkColumnDef="plateNumber">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">PLATE NUMBER</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 font-bold text-sm">WAP 1738</td>
-      </ng-container>
-
       <ng-container cdkColumnDef="vehicleType">
         <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">VEHICLE TPYE</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">CAR</td>
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">{{ element.vehicleType }}</td>
       </ng-container>
+
+      <ng-container cdkColumnDef="plateNumber">
+        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">PLATE NUMBER</th>
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 font-bold text-sm">{{ element.plateNumber }}</td>
+      </ng-container>
+
 
       <ng-container cdkColumnDef="availedAt">
         <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">AVAILED AT</th>
         <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
-          01-25-2026
+          {{ element.monthlyStart | date:'MM-dd-yyyy' }}
         </td>
       </ng-container>
 
       <ng-container cdkColumnDef="expiresAt">
         <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">EXPIRES AT</th>
         <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
-          02-25-2026
+          {{ element.monthlyEnd | date:'MM-dd-yyyy' }}
         </td>
       </ng-container>
 
-      <ng-container cdkColumnDef="duration">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">DURATION</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm"> 1 Month(s)</td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="fee">
+      <ng-container cdkColumnDef="amountPaid">
         <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">AMOUNT PAID</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm"> P 500.00 </td>
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">P 3000.00 </td>
       </ng-container>
 
       <ng-container cdkColumnDef="status">
