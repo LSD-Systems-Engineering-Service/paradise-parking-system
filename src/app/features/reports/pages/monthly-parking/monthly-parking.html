@@ -40,9 +40,11 @@
         </td>
       </ng-container>
 
-      <ng-container cdkColumnDef="amountPaid">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">AMOUNT PAID</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">P 3000.00 </td>
+      <ng-container cdkColumnDef="parkingFee">
+        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">PARKING FEE</th>
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
+          {{ element.parkingFee | peso }}
+        </td>
       </ng-container>
 
       <ng-container cdkColumnDef="status">

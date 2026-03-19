@@ -13,9 +13,10 @@ import { CdkTableModule } from '@angular/cdk/table';
 import { StatCard } from "../../../../shared/components/stat-card/stat-card";
 import { MatTableDataSource } from '@angular/material/table';
 import { DatePipe, NgClass } from '@angular/common';
-import { formatMinutes } from '../../../../shared/utils/time-format';
+import { formatMinutes } from '../../../../shared/utils/formatters.utils';
 import { ParkingService } from '../../../parking/services/parking.service';
 import { ParkingStatistics } from '../../../../../graphql/generated/graphql';
+import { PesoPipe } from '../../../../shared/pipes/peso-pipe';
 
 @Component({
   selector: 'app-daily-breakdown',
@@ -30,6 +31,7 @@ import { ParkingStatistics } from '../../../../../graphql/generated/graphql';
     CdkTableModule,
     DatePipe,
     NgClass,
+    PesoPipe
   ],
   templateUrl: './daily-breakdown.html',
 })

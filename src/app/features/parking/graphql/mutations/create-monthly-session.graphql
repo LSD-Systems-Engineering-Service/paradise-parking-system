@@ -7,5 +7,6 @@ mutation CreateMonthlySession($input: CreateMonthlySessionInput!) {
         paymentStatus
         parkingState
         rateType
+        parkingFee
     }
 }

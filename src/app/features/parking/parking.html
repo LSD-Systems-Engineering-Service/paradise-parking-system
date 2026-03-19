@@ -67,14 +67,45 @@
     <table cdk-table [dataSource]="sessionManagers.active.dataSource" class="w-full border-collapse">
       <ng-container cdkColumnDef="vehicleType">
         <th cdk-header-cell *cdkHeaderCellDef></th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 font-bold text-sm w-12">
-          @if (element.vehicleType == 'CAR') {
-            <lucide-angular [img]="Car" class="w-8 h-8"></lucide-angular>
-          } @else if (element.vehicleType == 'MOTORCYCLE') {
-            <lucide-angular [img]="Motorbike" class="w-8 h-8"></lucide-angular>
-          } @else {
-            <lucide-angular [img]="Truck" class="w-8 h-8"></lucide-angular>
-          }
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm w-32">
+          <div
+            class="flex items-center justify-center w-10 h-10 rounded-full border"
+            [ngClass]="{
+              'bg-emerald-50 border-emerald-200 text-emerald-700': element.vehicleType === 'CAR',
+              'bg-sky-50 border-sky-200 text-sky-700': element.vehicleType === 'MOTORCYCLE',
+              'bg-amber-50 border-amber-200 text-amber-700': element.vehicleType === 'TRUCK'
+            }"
+          >
+            @if (element.vehicleType == 'CAR') {
+              <lucide-angular [img]="Car" class="w-5 h-5"></lucide-angular>
+            } @else if (element.vehicleType == 'MOTORCYCLE') {
+              <lucide-angular [img]="Motorbike" class="w-5 h-5"></lucide-angular>
+            } @else {
+              <lucide-angular [img]="Truck" class="w-5 h-5"></lucide-angular>
+            }
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container cdkColumnDef="rateType">
+        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">RATE TYPE</th>
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
+          <div class="inline-flex items-center gap-2 rounded-sm px-3 py-1.5 border text-xs font-medium"
+            [ngClass]="{
+              'bg-emerald-50 border-emerald-200 text-emerald-800': element.rateType === 'HOURLY',
+              'bg-sky-50 border-sky-200 text-sky-800': element.rateType === 'OVERNIGHT',
+              'bg-amber-50 border-amber-200 text-amber-800': element.rateType === 'MONTHLY'
+            }"
+          >
+            @if (element.rateType === 'HOURLY') {
+              <lucide-angular [img]="RateHourly" class="w-4 h-4"></lucide-angular>
+            } @else if (element.rateType === 'OVERNIGHT') {
+              <lucide-angular [img]="RateOvernight" class="w-4 h-4"></lucide-angular>
+            } @else if (element.rateType === 'MONTHLY') {
+              <lucide-angular [img]="RateMonthly" class="w-4 h-4"></lucide-angular>
+            }
+            <span>{{ element.rateType | titlecase }}</span>
+          </div>
         </td>
       </ng-container>
       
@@ -86,15 +117,14 @@
       <ng-container cdkColumnDef="enteredAt">
         <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">ENTERED AT</th>
         <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
-          {{ element.enteredAt | date:'hh:mm a' }}
+          {{ element.enteredAt | date:'MM-dd-yyyy, y hh:mm a' }}
         </td>
       </ng-container>
 
       <ng-container cdkColumnDef="status">
         <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">STATUS</th>
         <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600">
-          <span 
-            class="px-3 py-2 rounded-md text-text-900 text-xs border"
+          <span class="px-3 py-2 rounded-md text-text-900 text-xs border"
             [ngClass]="{'bg-emerald-300 border-emerald-700': element.paymentStatus === 'PAID', 'bg-red-300 border-red-700': element.paymentStatus === 'OVERDUE', 'bg-slate-300 border-slate-700': element.paymentStatus === 'UNPAID'}"
           >
             {{ element.paymentStatus }}
@@ -104,14 +134,16 @@
 
       <ng-container cdkColumnDef="actions">
         <th cdk-header-cell *cdkHeaderCellDef class="px-8 py-4 text-xs text-white whitespace-nowrap text-right">ACTIONS</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-3 flex items-center justify-end gap-4 text-text-600"> 
-          <app-button variant="danger" (click)="exitSession(element)">Exit</app-button>
-          <app-button (click)="handleRetryEntryPrint(element.id)">Retry Print</app-button>
-          <lucide-angular [img]="ellipsisVertical" class="w-6 h-6" [matMenuTriggerFor]="menu"></lucide-angular>
-          <mat-menu #menu="matMenu">
-            <button mat-menu-item>Void</button>
-            <button mat-menu-item>Unsetled</button>
-          </mat-menu>
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600"> 
+          <div class="flex items-center justify-end gap-4">
+            <app-button variant="danger" (click)="exitSession(element)">Exit</app-button>
+            <app-button (click)="handleRetryEntryPrint(element.id)" class="whitespace-nowrap">Retry Print</app-button>
+            <lucide-angular [img]="ellipsisVertical" class="w-6 h-6" [matMenuTriggerFor]="menu"></lucide-angular>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item>Void</button>
+              <button mat-menu-item>Unsetled</button>
+            </mat-menu>
+          </div>
         </td>
       </ng-container>
 
@@ -141,14 +173,46 @@
     <table cdk-table [dataSource]="sessionManagers.exited.dataSource" class="w-full border-collapse">
       <ng-container cdkColumnDef="vehicleType">
         <th cdk-header-cell *cdkHeaderCellDef></th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 font-bold text-sm w-12">
-          @if (element.vehicleType == 'CAR') {
-            <lucide-angular [img]="Car" class="w-8 h-8"></lucide-angular>
-          } @else if (element.vehicleType == 'MOTORCYCLE') {
-            <lucide-angular [img]="Motorbike" class="w-8 h-8"></lucide-angular>
-          } @else {
-            <lucide-angular [img]="Truck" class="w-8 h-8"></lucide-angular>
-          }
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm w-32">
+          <div
+            class="flex items-center justify-center w-10 h-10 rounded-full border"
+            [ngClass]="{
+              'bg-emerald-50 border-emerald-200 text-emerald-700': element.vehicleType === 'CAR',
+              'bg-sky-50 border-sky-200 text-sky-700': element.vehicleType === 'MOTORCYCLE',
+              'bg-amber-50 border-amber-200 text-amber-700': element.vehicleType === 'TRUCK'
+            }"
+          >
+            @if (element.vehicleType == 'CAR') {
+              <lucide-angular [img]="Car" class="w-5 h-5"></lucide-angular>
+            } @else if (element.vehicleType == 'MOTORCYCLE') {
+              <lucide-angular [img]="Motorbike" class="w-5 h-5"></lucide-angular>
+            } @else {
+              <lucide-angular [img]="Truck" class="w-5 h-5"></lucide-angular>
+            }
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container cdkColumnDef="rateType">
+        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">RATE TYPE</th>
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
+          <div
+            class="inline-flex items-center gap-2 rounded-sm px-3 py-1.5 border text-xs font-medium"
+            [ngClass]="{
+              'bg-emerald-50 border-emerald-200 text-emerald-800': element.rateType === 'HOURLY',
+              'bg-sky-50 border-sky-200 text-sky-800': element.rateType === 'OVERNIGHT',
+              'bg-amber-50 border-amber-200 text-amber-800': element.rateType === 'MONTHLY'
+            }"
+          >
+            @if (element.rateType === 'HOURLY') {
+              <lucide-angular [img]="RateHourly" class="w-4 h-4"></lucide-angular>
+            } @else if (element.rateType === 'OVERNIGHT') {
+              <lucide-angular [img]="RateOvernight" class="w-4 h-4"></lucide-angular>
+            } @else if (element.rateType === 'MONTHLY') {
+              <lucide-angular [img]="RateMonthly" class="w-4 h-4"></lucide-angular>
+            }
+            <span>{{ element.rateType | titlecase }}</span>
+          </div>
         </td>
       </ng-container>
 
@@ -160,14 +224,14 @@
       <ng-container cdkColumnDef="enteredAt">
         <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">ENTERED AT</th>
         <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
-          {{ element.enteredAt | date:'hh:mm a' }}
+          {{ element.enteredAt | date:'MM-dd-yyyy, hh:mm a' }}
         </td>
       </ng-container>
 
       <ng-container cdkColumnDef="exitedAt">
         <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">EXITED AT</th>
         <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
-          {{ element.exitedAt | date:'hh:mm:ss a' }}
+          {{ element.exitedAt | date:'MM-dd-yyyy, hh:mm a' }}
         </td>
       </ng-container>
 
@@ -178,7 +242,7 @@
 
       <ng-container cdkColumnDef="fee">
         <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">FEE</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm"> {{ element.parkingFee }} </td>
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm"> {{ element.parkingFee | peso }} </td>
       </ng-container>
 
       <ng-container cdkColumnDef="status">
@@ -196,7 +260,7 @@
       <ng-container cdkColumnDef="actions">
         <th cdk-header-cell *cdkHeaderCellDef class="text-right px-6 py-4 text-xs text-white whitespace-nowrap">ACTIONS</th>
         <td cdk-cell *cdkCellDef="let element" class="text-right px-6 py-4 text-text-600">
-          <app-button (click)="handleRetryExitPrint(element.id)">Retry Print</app-button>
+          <app-button (click)="handleRetryExitPrint(element.id)" class="whitespace-nowrap">Retry Print</app-button>
         </td>
       </ng-container>
 
@@ -217,7 +281,7 @@
       <div>
         <p class="text-text-300">Revenue Today</p>
         <p class="text-text-900 font-bold mt-1">
-          ₱{{ stats?.revenueToday ?? 0 }}
+          {{ stats?.revenueToday ?? 0 | peso }}
         </p>
       </div>
       <img src="/images/icons/revenue.png" alt="Revenue Icon" class="h-16">

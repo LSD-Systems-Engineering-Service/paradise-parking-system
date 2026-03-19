@@ -4,7 +4,7 @@ import { MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { Button } from '../../../../shared/ui/button/button';
 import { MatFormField, MatLabel, MatHint, MatInput, MatError } from "@angular/material/input";
 import { MatDatepickerModule } from "@angular/material/datepicker";
-import { getLastMonthDate, getTodayISO } from '../../../../shared/utils/date.utils';
+import { getLastMonthDate, getNextMonthDate, getTodayISO } from '../../../../shared/utils/date.utils';
 import { MAT_DATE_FORMATS, MatOption } from '@angular/material/core';
 import { DASHBOARD_DATE_FORMAT } from '../../../../shared/utils/date-format';
 import { MatSelectModule } from '@angular/material/select';
@@ -44,8 +44,8 @@ export class AddMonthlyDialog {
   })
 
   readonly range = new FormGroup({
-    start: new FormControl<Date | null>(getLastMonthDate()),
-    end: new FormControl<Date | null>(new Date()),
+    start: new FormControl<Date | null>(new Date()),
+    end: new FormControl<Date | null>(getNextMonthDate()),
   });
 
   onSubmit() {

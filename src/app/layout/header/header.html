@@ -1,33 +1,83 @@
-<header class="border-b border-primary">
-  <nav class="main-container py-4 flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <img src="/images/brand-logo-green-variant.png" alt="Brand Logo" class="w-12 cursor-pointer" routerLink="/">
-      <div class="hidden md:flex flex-col">
-        <h1 class="text-xl font-semibold">RICHMOND SQUARE PARKING</h1>
-        <h2 class="text-md font-black text-primary">by Paradise Parking System</h2>
+<header class="sticky top-0 z-50 border-b border-black/10 bg-white/80 supports-backdrop-filter:bg-white/70 supports-backdrop-filter:backdrop-blur">
+  <nav class="main-container py-3 md:py-4">
+    <div class="flex items-center justify-between gap-3">
+      <a class="flex items-center gap-3 min-w-0" routerLink="/" (click)="closeMobileMenu()">
+        <img
+          src="/images/brand-logo-green-variant.png"
+          alt="Richmond Square Parking"
+          class="w-10 md:w-12 shrink-0"
+        >
+        <div class="min-w-0">
+          <div class="font-semibold tracking-tight text-base md:text-xl truncate">
+            Richmond Square Parking
+          </div>
+          <div class="text-xs md:text-sm font-semibold text-primary truncate">
+            Paradise Parking System
+          </div>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2 md:gap-4 shrink-0">
+        <ul class="hidden md:flex font-medium text-text-600 gap-4">
+          @for (item of menuItems; track $index) {
+            @if (hasAccess(item.roles)) {
+              <li
+                class="cursor-pointer hover:text-text-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 rounded-md px-2 py-1"
+                routerLink="{{item.path}}"
+              >
+                {{item.label}}
+              </li>
+            }
+          }
+        </ul>
+
+        <div class="hidden md:block">
+          @if (authService.isLoggedIn()) {
+            <app-button variant="danger" (click)="authService.logout()">Logout</app-button>
+          } @else {
+            <app-button variant="primary" routerLink="/login">Login</app-button>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="md:hidden inline-flex items-center justify-center rounded-md border border-black/10 bg-white px-3 py-2 text-sm font-semibold text-text-900"
+          [attr.aria-expanded]="isMobileMenuOpen"
+          aria-controls="mobile-menu"
+          aria-label="Toggle menu"
+          (click)="toggleMobileMenu()"
+        >
+          Menu
+        </button>
       </div>
     </div>
 
-    <div class="flex items-center gap-6">
-      <ul class="flex font-medium text-text-600 gap-4">
-        @for (item of menuItems; track $index) {
-          @if (hasAccess(item.roles)) {
-            <li class="cursor-pointer" routerLink="{{item.path}}">{{item.label}}</li>
+    @if (isMobileMenuOpen) {
+      <div id="mobile-menu" class="md:hidden mt-3 rounded-lg border border-black/10 bg-white p-2">
+        <ul class="flex flex-col font-medium text-text-700">
+          @for (item of menuItems; track $index) {
+            @if (hasAccess(item.roles)) {
+              <li>
+                <a
+                  class="block rounded-md px-3 py-2 hover:bg-black/5 hover:text-text-900"
+                  routerLink="{{item.path}}"
+                  (click)="closeMobileMenu()"
+                >
+                  {{item.label}}
+                </a>
+              </li>
+            }
           }
-        }
-      </ul>
+        </ul>
 
-      @if (authService.isLoggedIn()) {
-        <app-button 
-          variant="danger"
-          (click)="authService.logout()"
-        >Logout</app-button>
-      } @else {
-        <app-button 
-          variant="primary"
-          routerLink="/login"
-        >Login</app-button>
-      }
-    </div>
+        <div class="mt-2 border-t border-black/10 pt-2">
+          @if (authService.isLoggedIn()) {
+            <app-button variant="danger" (click)="authService.logout(); closeMobileMenu()">Logout</app-button>
+          } @else {
+            <app-button variant="primary" routerLink="/login" (click)="closeMobileMenu()">Login</app-button>
+          }
+        </div>
+      </div>
+    }
   </nav>
 </header>

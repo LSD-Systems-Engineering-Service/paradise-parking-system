@@ -2,7 +2,7 @@ query GetParkingSessions(
   $page: Int!
   $limit: Int!
   $parkingState: String!
-  $date: String!
+  $date: String
   $includeInBIRReport: Boolean
 ) {
   parkingSessionsByParkingState(
@@ -22,6 +22,7 @@ query GetParkingSessions(
       parkingFee
       parkingState
       paymentStatus
+      rateType
       includeInBIRReport
     }
     meta {

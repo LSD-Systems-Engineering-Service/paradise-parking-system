@@ -28,7 +28,7 @@
       </div>
 
       <div class="flex flex-col mb-3">
-        <div class="flex gap-10 mb-2">
+        <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-8 mb-2">
           <mat-checkbox [checked]="hasDiscount" (change)="onCheckboxChangePWD($event)" [disabled]="scpwdCheck">PWD/Senior Discount</mat-checkbox>
           <mat-checkbox [checked]="isDelivery" (change)="onCheckboxChangeDelivery($event)" [disabled]="deliveryCheck">Delivery Vehicle</mat-checkbox>
           <mat-checkbox 
@@ -38,13 +38,13 @@
         </div>
 
         @if (hasDiscount) {
-          <div class="flex flex-col space-y-1">
-            <mat-form-field class="w-1/2" appearance="outline">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <mat-form-field class="w-full" appearance="outline">
               <mat-label>Name</mat-label>
               <input formControlName="discountHolderName" matInput placeholder="Name">
             </mat-form-field>
 
-            <mat-form-field class="w-1/2" appearance="outline">
+            <mat-form-field class="w-full" appearance="outline">
               <mat-label>PWD/SC ID</mat-label>
               <input formControlName="discountIdNumber" matInput placeholder="Enter PWD/SC ID Number">
             </mat-form-field>

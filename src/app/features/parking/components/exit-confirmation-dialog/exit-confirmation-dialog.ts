@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/materi
 import { MatCheckboxModule, MatCheckboxChange } from '@angular/material/checkbox';
 import { Button } from '../../../../shared/ui/button/button';
 import { ReactiveFormsModule } from '@angular/forms';
-import { formatMinutes } from '../../../../shared/utils/time-format';
+import { formatMinutes } from '../../../../shared/utils/formatters.utils';
 
 @Component({
   selector: 'app-exit-confirmation-dialog',

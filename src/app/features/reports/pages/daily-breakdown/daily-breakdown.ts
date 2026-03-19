@@ -18,9 +18,10 @@ import { NgxEchartsDirective } from 'ngx-echarts';
 import type { ECharts } from 'echarts/core';
 import { ParkingService } from '../../../parking/services/parking.service';
 import { ParkingStatistics } from '../../../../../graphql/generated/graphql';
-import { formatMinutes } from '../../../../shared/utils/time-format';
+import { formatMinutes } from '../../../../shared/utils/formatters.utils';
 import { Button } from "../../../../shared/ui/button/button";
 import { ReportsService } from '../../services/reports.service';
+import { PesoPipe } from '../../../../shared/pipes/peso-pipe';
 
 type SessionState = 'ACTIVE' | 'EXITED';
 
@@ -38,7 +39,8 @@ type SessionState = 'ACTIVE' | 'EXITED';
     DatePipe,
     NgClass,
     NgxEchartsDirective,
-    Button
+    Button,
+    PesoPipe
 ],
   templateUrl: './daily-breakdown.html',
 })

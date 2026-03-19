@@ -20,8 +20,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddMonthlyDialog } from '../../components/add-monthly-dialog/add-monthly-dialog';
 import { ParkingService } from '../../../parking/services/parking.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ParkingSession } from '../../../../../graphql/generated/graphql';
-
+import { PesoPipe } from '../../../../shared/pipes/peso-pipe';
 
 @Component({
   selector: 'app-monthly-parking',
@@ -38,7 +37,8 @@ import { ParkingSession } from '../../../../../graphql/generated/graphql';
     NgxEchartsDirective,
     Button,
     MatCheckboxModule,
-    DatePipe
+    DatePipe,
+    PesoPipe
   ],
   templateUrl: './monthly-parking.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,7 +55,7 @@ export class MonthlyParking {
   private destroyRef = inject(DestroyRef);
   private parkingService = inject(ParkingService);
 
-  readonly COLUMNS: string[] = ['vehicleType', 'plateNumber', 'availedAt', 'expiresAt', 'amountPaid', 'status'] as const;
+  readonly COLUMNS: string[] = ['vehicleType', 'plateNumber', 'availedAt', 'expiresAt', 'parkingFee', 'status'] as const;
   dataSource = new MatTableDataSource<any>([]);
 
   ngOnInit(): void {

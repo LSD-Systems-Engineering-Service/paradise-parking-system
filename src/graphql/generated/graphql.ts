@@ -141,7 +141,7 @@ export type QueryParkingSessionsArgs = {
 
 
 export type QueryParkingSessionsByParkingStateArgs = {
-  date: Scalars['String']['input'];
+  date?: InputMaybe<Scalars['String']['input']>;
   includeInBIRReport?: InputMaybe<Scalars['Boolean']['input']>;
   limit: Scalars['Int']['input'];
   page: Scalars['Int']['input'];
@@ -183,7 +183,7 @@ export type CreateMonthlySessionMutationVariables = Exact<{
 }>;
 
 
-export type CreateMonthlySessionMutation = { __typename?: 'Mutation', createMonthlySession: { __typename?: 'ParkingSession', id: string, vehicleType: VehicleType, plateNumber: string, enteredAt: any, paymentStatus: PaymentStatus, parkingState: ParkingState, rateType: RateType } };
+export type CreateMonthlySessionMutation = { __typename?: 'Mutation', createMonthlySession: { __typename?: 'ParkingSession', id: string, vehicleType: VehicleType, plateNumber: string, enteredAt: any, paymentStatus: PaymentStatus, parkingState: ParkingState, rateType: RateType, parkingFee?: number | null } };
 
 export type CreateParkingSessionMutationVariables = Exact<{
   input: CreateParkingSessionInput;
@@ -212,12 +212,12 @@ export type GetParkingSessionsQueryVariables = Exact<{
   page: Scalars['Int']['input'];
   limit: Scalars['Int']['input'];
   parkingState: Scalars['String']['input'];
-  date: Scalars['String']['input'];
+  date?: InputMaybe<Scalars['String']['input']>;
   includeInBIRReport?: InputMaybe<Scalars['Boolean']['input']>;
 }>;
 
 
-export type GetParkingSessionsQuery = { __typename?: 'Query', parkingSessionsByParkingState: { __typename?: 'PaginatedParkingSessions', data: Array<{ __typename?: 'ParkingSession', id: string, vehicleType: VehicleType, plateNumber: string, enteredAt: any, exitedAt?: any | null, durationMinutes?: number | null, parkingFee?: number | null, parkingState: ParkingState, paymentStatus: PaymentStatus, includeInBIRReport: boolean }>, meta: { __typename?: 'PaginationMeta', total: number, page: number, totalPages: number } } };
+export type GetParkingSessionsQuery = { __typename?: 'Query', parkingSessionsByParkingState: { __typename?: 'PaginatedParkingSessions', data: Array<{ __typename?: 'ParkingSession', id: string, vehicleType: VehicleType, plateNumber: string, enteredAt: any, exitedAt?: any | null, durationMinutes?: number | null, parkingFee?: number | null, parkingState: ParkingState, paymentStatus: PaymentStatus, rateType: RateType, includeInBIRReport: boolean }>, meta: { __typename?: 'PaginationMeta', total: number, page: number, totalPages: number } } };
 
 export type GetParkingStatisticsQueryVariables = Exact<{
   parkingState: Scalars['String']['input'];
@@ -245,6 +245,7 @@ export const CreateMonthlySessionDocument = gql`
     paymentStatus
     parkingState
     rateType
+    parkingFee
   }
 }
     `;
@@ -342,7 +343,7 @@ export const MonthlySessionsDocument = gql`
     }
   }
 export const GetParkingSessionsDocument = gql`
-    query GetParkingSessions($page: Int!, $limit: Int!, $parkingState: String!, $date: String!, $includeInBIRReport: Boolean) {
+    query GetParkingSessions($page: Int!, $limit: Int!, $parkingState: String!, $date: String, $includeInBIRReport: Boolean) {
   parkingSessionsByParkingState(
     page: $page
     limit: $limit
@@ -360,6 +361,7 @@ export const GetParkingSessionsDocument = gql`
       parkingFee
       parkingState
       paymentStatus
+      rateType
       includeInBIRReport
     }
     meta {

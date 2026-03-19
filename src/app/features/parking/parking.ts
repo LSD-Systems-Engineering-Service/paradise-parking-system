@@ -17,7 +17,7 @@ import { ParkingService } from './services/parking.service';
 import { QueryState } from '../../core/models/graphql-response.model';
 import { ParkingSession } from './models/parking-session.model';
 
-import { Car, EllipsisVertical, LucideAngularModule, Motorbike, ScanQrCode, Truck } from 'lucide-angular';
+import { CalendarDays, Car, Clock3, EllipsisVertical, LucideAngularModule, Motorbike, MoonStar, ScanQrCode, Truck } from 'lucide-angular';
 import { PaginatedResponse } from '../../shared/types/paginated-response.type';
 import { ParkingEntryForm } from "./components/parking-entry-form/parking-entry-form";
 import { ExitConfirmationDialog } from './components/exit-confirmation-dialog/exit-confirmation-dialog';
@@ -25,7 +25,8 @@ import { Button } from '../../shared/ui/button/button';
 import { PARKING_MESSAGES } from './constants/parking.constants';
 import { getTodayISO } from '../../shared/utils/date.utils';
 import { ParkingStatistics } from '../../../graphql/generated/graphql';
-import { formatMinutes } from '../../shared/utils/time-format';
+import { formatMinutes } from '../../shared/utils/formatters.utils';
+import { PesoPipe } from '../../shared/pipes/peso-pipe';
 
 type SessionState = 'ACTIVE' | 'EXITED';
 
@@ -42,7 +43,8 @@ type SessionState = 'ACTIVE' | 'EXITED';
     RouterLink,
     Button,
     MatPaginator,
-    MatMenuModule
+    MatMenuModule,
+    PesoPipe
   ],
   templateUrl: './parking.html',
   styleUrl: './parking.css',
@@ -55,8 +57,12 @@ export class Parking {
   readonly ScanQrCode = ScanQrCode;
   readonly ellipsisVertical = EllipsisVertical;
 
-  readonly ACTIVE_SESSION_COLUMNS: string[] = ['vehicleType', 'plateNumber', 'enteredAt', 'status', 'actions'] as const;
-  readonly EXITED_SESSION_COLUMNS: string[] = ['vehicleType', 'plateNumber', 'enteredAt', 'exitedAt', 'duration', 'fee', 'status', 'actions'] as const;
+  readonly RateHourly = Clock3;
+  readonly RateOvernight = MoonStar;
+  readonly RateMonthly = CalendarDays;
+
+  readonly ACTIVE_SESSION_COLUMNS: string[] = ['vehicleType', 'rateType', 'plateNumber', 'enteredAt', 'status', 'actions'] as const;
+  readonly EXITED_SESSION_COLUMNS: string[] = ['vehicleType', 'rateType', 'plateNumber', 'enteredAt', 'exitedAt', 'duration', 'fee', 'status', 'actions'] as const;
 
   @ViewChild('activeSessionsPaginator') activeSessionsPaginator!: MatPaginator;
   @ViewChild('exitedSessionsPaginator') exitedSessionsPaginator!: MatPaginator;
@@ -98,13 +104,13 @@ export class Parking {
     const manager = state === 'ACTIVE' ? this.sessionManagers.active : this.sessionManagers.exited;
     manager.state.loading = true;
     manager.state.error = null;
-    const currentDate = getTodayISO()
+    const currentDate = getTodayISO();
 
     this.parkingService.getParkingSessions({
       page: 1,
       limit: 10,
       parkingState: state,
-      date: currentDate,
+      ...(state === 'EXITED' ? { date: currentDate } : {}),
     }).pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({

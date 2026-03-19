@@ -14,6 +14,7 @@ import { Button } from '../../shared/ui/button/button';
 })
 export class Header {
   public authService = inject(AuthService);
+  isMobileMenuOpen = false;
 
   menuItems = [
     { label: 'Dashboard', path: 'dashboard', roles: ['admin']  },
@@ -21,6 +22,14 @@ export class Header {
     { label: 'Reports', path: 'reports', roles: ['admin'] },
     { label: 'Reports', path: 'b/reports', roles: ['thetaxman'] },
   ];
+
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.isMobileMenuOpen = false;
+  }
 
   hasAccess(roles?: string[]): boolean {
     const role = this.authService.getRole();

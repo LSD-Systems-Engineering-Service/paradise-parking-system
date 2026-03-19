@@ -5,6 +5,13 @@ export const getLastMonthDate = (): Date => {
   return lastMonth;
 };
 
+export const getNextMonthDate = (): Date => {
+  const today = new Date();
+  const nextMonth = new Date(today);
+  nextMonth.setMonth(today.getMonth() + 1);
+  return nextMonth;
+}
+
 export function formatTime(date: Date) {
   return new Intl.DateTimeFormat('en-PH', {
     hour: '2-digit',

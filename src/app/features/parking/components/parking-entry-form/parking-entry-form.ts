@@ -35,11 +35,10 @@ export class ParkingEntryForm {
   entryForm: FormGroup = this.fb.group({
     vehicleType: ['', Validators.required],
     plateNumber: ['', Validators.required],
-    rateType: ['HOURLY', Validators.required]
-    // discountType: ['NONE'],
-    // discountHolderName: [''],
-    // discountIdNumber: [''],
-  })
+    rateType: ['HOURLY', Validators.required],
+    discountHolderName: [''],
+    discountIdNumber: [''],
+  });
 
   hasDiscount = false;
   isDelivery = false;
@@ -47,19 +46,26 @@ export class ParkingEntryForm {
   scpwdCheck = false;
   deliveryCheck = false;
 
-  idPWDSC = new FormControl('')
-
   onCheckboxChangePWD(event: MatCheckboxChange){
     this.hasDiscount = event.checked;
     
     console.log('Status', event.checked)
     if (this.hasDiscount) {
       this.deliveryCheck = true;
+      this.entryForm.get('discountHolderName')?.setValidators([Validators.required]);
+      this.entryForm.get('discountIdNumber')?.setValidators([Validators.required]);
+      this.entryForm.get('discountHolderName')?.updateValueAndValidity();
+      this.entryForm.get('discountIdNumber')?.updateValueAndValidity();
       console.log("Is PWD/Senior")
       console.log(this.hasDiscount)
     } else {
       console.log("Is NOT PWD/Senior")
       this.deliveryCheck = false;
+      this.entryForm.get('discountHolderName')?.clearValidators();
+      this.entryForm.get('discountIdNumber')?.clearValidators();
+      this.entryForm.patchValue({ discountHolderName: '', discountIdNumber: '' });
+      this.entryForm.get('discountHolderName')?.updateValueAndValidity();
+      this.entryForm.get('discountIdNumber')?.updateValueAndValidity();
       console.log(this.hasDiscount)
     }
   }

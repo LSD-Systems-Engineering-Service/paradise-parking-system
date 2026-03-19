@@ -10,18 +10,11 @@
   </mat-form-field>
 
   <div class="mt-6 grid md:grid-cols-4 gap-6">
-    <app-stat-card
-      [icon]="Banknote"
-      label="Total Revenue Today"
-      [value]="'₱' + (stats?.revenueToday ?? 0)"
-    ></app-stat-card>
+    <app-stat-card [icon]="Banknote" label="Total Revenue Today"
+      [value]="(stats?.revenueToday ?? 0) | peso"></app-stat-card>
 
-    <app-stat-card
-      [icon]="Car"
-      label="Total Entries"
-      [value]="'₱' + (stats?.totalEntriesToday ?? 0)"
-      iconBgClass="bg-blue-200 text-blue-700"
-    ></app-stat-card>
+    <app-stat-card [icon]="Car" label="Total Entries" [value]="(stats?.totalEntriesToday ?? 0)"
+      iconBgClass="bg-blue-200 text-blue-700"></app-stat-card>
   </div>
 
   <h2 class="text-2xl font-semibold mt-6">Transaction Logs</h2>
@@ -30,38 +23,50 @@
       <ng-container cdkColumnDef="vehicleType">
         <th cdk-header-cell *cdkHeaderCellDef></th>
         <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 font-bold text-sm w-12">
-          @if (element.vehicleType == 'CAR') {
-            <lucide-angular [img]="Car" class="w-8 h-8"></lucide-angular>
-          } @else if (element.vehicleType == 'MOTORCYCLE') {
-            <lucide-angular [img]="Motorbike" class="w-8 h-8"></lucide-angular>
-          } @else {
-            <lucide-angular [img]="Truck" class="w-8 h-8"></lucide-angular>
-          }
+          <div class="flex items-center justify-center w-10 h-10 rounded-full border" [ngClass]="{
+              'bg-emerald-50 border-emerald-200 text-emerald-700': element.vehicleType === 'CAR',
+              'bg-sky-50 border-sky-200 text-sky-700': element.vehicleType === 'MOTORCYCLE',
+              'bg-amber-50 border-amber-200 text-amber-700': element.vehicleType === 'TRUCK'
+            }">
+            @if (element.vehicleType == 'CAR') {
+            <lucide-angular [img]="Car" class="w-5 h-5"></lucide-angular>
+            } @else if (element.vehicleType == 'MOTORCYCLE') {
+            <lucide-angular [img]="Motorbike" class="w-5 h-5"></lucide-angular>
+            } @else {
+            <lucide-angular [img]="Truck" class="w-5 h-5"></lucide-angular>
+            }
+          </div>
         </td>
       </ng-container>
 
       <ng-container cdkColumnDef="plateNumber">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">VEHICLE TPYE</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 font-bold text-sm">{{element.plateNumber}}</td>
+        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">VEHICLE
+          TPYE</th>
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 font-bold text-sm">{{element.plateNumber}}
+        </td>
       </ng-container>
 
       <ng-container cdkColumnDef="enteredAt">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">ENTERED AT</th>
+        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">ENTERED
+          AT</th>
         <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
           {{ element.enteredAt | date:'hh:mm:ss a' }}
         </td>
       </ng-container>
 
       <ng-container cdkColumnDef="exitedAt">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">EXITED AT</th>
+        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">EXITED AT
+        </th>
         <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
           {{ element.exitedAt | date:'hh:mm:ss a' }}
         </td>
       </ng-container>
 
       <ng-container cdkColumnDef="duration">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">DURATION</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm"> {{ formatMinutes(element.durationMinutes) }} mins</td>
+        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">DURATION
+        </th>
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm"> {{
+          formatMinutes(element.durationMinutes) }} mins</td>
       </ng-container>
 
       <ng-container cdkColumnDef="fee">
@@ -70,19 +75,19 @@
       </ng-container>
 
       <ng-container cdkColumnDef="status">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">STATUS</th>
+        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">STATUS
+        </th>
         <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600">
-          <span
-            class="px-3 py-2 rounded-md text-text-900 text-xs border"
-            [ngClass]="{'bg-emerald-300 border-emerald-700': element.paymentStatus === 'PAID', 'bg-red-300 border-red-700': element.paymentStatus === 'OVERDUE', 'bg-slate-300 border-slate-700': element.paymentStatus === 'UNPAID'}"
-          >
+          <span class="px-3 py-2 rounded-md text-text-900 text-xs border"
+            [ngClass]="{'bg-emerald-300 border-emerald-700': element.paymentStatus === 'PAID', 'bg-red-300 border-red-700': element.paymentStatus === 'OVERDUE', 'bg-slate-300 border-slate-700': element.paymentStatus === 'UNPAID'}">
             {{ element.paymentStatus }}
           </span>
         </td>
       </ng-container>
 
       <tr cdk-header-row *cdkHeaderRowDef="COLUMNS" class="bg-secondary"></tr>
-      <tr cdk-row *cdkRowDef="let row; columns: COLUMNS;" class="border-b border-slate-200 hover:bg-emerald-50 transition-colors"></tr>
+      <tr cdk-row *cdkRowDef="let row; columns: COLUMNS;"
+        class="border-b border-slate-200 hover:bg-emerald-50 transition-colors"></tr>
     </table>
   </div>
 </section>
