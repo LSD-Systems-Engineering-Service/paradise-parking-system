@@ -223,15 +223,15 @@
 
       <ng-container cdkColumnDef="enteredAt">
         <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">ENTERED AT</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
-          {{ element.enteredAt | date:'MM-dd-yyyy, hh:mm a' }}
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm whitespace-nowrap">
+          {{ element.enteredAt | date:'MM-dd, hh:mm a' }}
         </td>
       </ng-container>
 
       <ng-container cdkColumnDef="exitedAt">
         <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">EXITED AT</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
-          {{ element.exitedAt | date:'MM-dd-yyyy, hh:mm a' }}
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm whitespace-nowrap">
+          {{ element.exitedAt | date:'MM-dd, hh:mm a' }}
         </td>
       </ng-container>
 

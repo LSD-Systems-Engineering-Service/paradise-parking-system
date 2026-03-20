@@ -36,8 +36,8 @@ export class ParkingEntryForm {
     vehicleType: ['', Validators.required],
     plateNumber: ['', Validators.required],
     rateType: ['HOURLY', Validators.required],
-    discountHolderName: [''],
-    discountIdNumber: [''],
+    // discountHolderName: [''],
+    // discountIdNumber: [''],
   });
 
   hasDiscount = false;
@@ -52,21 +52,18 @@ export class ParkingEntryForm {
     console.log('Status', event.checked)
     if (this.hasDiscount) {
       this.deliveryCheck = true;
-      this.entryForm.get('discountHolderName')?.setValidators([Validators.required]);
-      this.entryForm.get('discountIdNumber')?.setValidators([Validators.required]);
-      this.entryForm.get('discountHolderName')?.updateValueAndValidity();
-      this.entryForm.get('discountIdNumber')?.updateValueAndValidity();
-      console.log("Is PWD/Senior")
-      console.log(this.hasDiscount)
+      // this.entryForm.get('discountHolderName')?.setValidators([Validators.required]);
+      // this.entryForm.get('discountIdNumber')?.setValidators([Validators.required]);
+      // this.entryForm.get('discountHolderName')?.updateValueAndValidity();
+      // this.entryForm.get('discountIdNumber')?.updateValueAndValidity();
     } else {
-      console.log("Is NOT PWD/Senior")
       this.deliveryCheck = false;
-      this.entryForm.get('discountHolderName')?.clearValidators();
-      this.entryForm.get('discountIdNumber')?.clearValidators();
-      this.entryForm.patchValue({ discountHolderName: '', discountIdNumber: '' });
-      this.entryForm.get('discountHolderName')?.updateValueAndValidity();
-      this.entryForm.get('discountIdNumber')?.updateValueAndValidity();
-      console.log(this.hasDiscount)
+      // this.entryForm.get('discountHolderName')?.clearValidators();
+      // this.entryForm.get('discountIdNumber')?.clearValidators();
+      // this.entryForm.patchValue({ discountHolderName: '', discountIdNumber: '' });
+      // this.entryForm.get('discountHolderName')?.updateValueAndValidity();
+      // this.entryForm.get('discountIdNumber')?.updateValueAndValidity();
+      // console.log(this.hasDiscount)
     }
   }
 

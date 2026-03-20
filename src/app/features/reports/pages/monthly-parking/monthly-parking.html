@@ -17,7 +17,21 @@
     <table cdk-table [dataSource]="dataSource" class="w-full border-collapse">
       <ng-container cdkColumnDef="vehicleType">
         <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">VEHICLE TPYE</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">{{ element.vehicleType }}</td>
+        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
+          <div
+            class="flex items-center justify-center w-10 h-10 rounded-full border"
+            [ngClass]="{
+              'bg-emerald-50 border-emerald-200 text-emerald-700': element.vehicleType === 'CAR',
+              'bg-sky-50 border-sky-200 text-sky-700': element.vehicleType === 'MOTORCYCLE',
+            }"
+          >
+            @if (element.vehicleType == 'CAR') {
+              <lucide-angular [img]="Car" class="w-5 h-5"></lucide-angular>
+            } @else if (element.vehicleType == 'MOTORCYCLE') {
+              <lucide-angular [img]="Motorbike" class="w-5 h-5"></lucide-angular>
+            }
+          </div>
+        </td>
       </ng-container>
 
       <ng-container cdkColumnDef="plateNumber">
