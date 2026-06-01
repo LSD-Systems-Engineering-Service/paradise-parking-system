@@ -1,0 +1,102 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep .parking-search-field .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.parking-page {
+  scroll-behavior: smooth;
+}
+
+.parking-stat-card,
+.parking-summary-card {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  min-height: 5.75rem;
+  padding: 1rem;
+}
+
+.parking-stat-label {
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.parking-stat-value {
+  color: #0f172a;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.15;
+  margin-top: 0.25rem;
+}
+
+.mobile-session-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
+  padding: 1rem;
+}
+
+.session-pill {
+  align-items: center;
+  border-radius: 6px;
+  border-style: solid;
+  border-width: 1px;
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 800;
+  gap: 0.35rem;
+  padding: 0.4rem 0.6rem;
+  white-space: nowrap;
+}
+
+.touch-action,
+.table-action {
+  align-items: center;
+  border-radius: 6px;
+  display: inline-flex;
+  font-weight: 800;
+  gap: 0.4rem;
+  justify-content: center;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.touch-action {
+  min-height: 3rem;
+  padding: 0.75rem 0.85rem;
+}
+
+.table-action {
+  min-height: 2.25rem;
+  padding: 0.45rem 0.75rem;
+  white-space: nowrap;
+}
+
+.parking-table-head {
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 0.95rem 1rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.parking-table-cell {
+  color: #475569;
+  font-size: 0.875rem;
+  padding: 0.9rem 1rem;
+  vertical-align: middle;
+}

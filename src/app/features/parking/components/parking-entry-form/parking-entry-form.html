@@ -1,66 +1,65 @@
-<div class="p-6 bg-white rounded-lg shadow-sm border border-slate-200">
-  <div class="md:flex justify-between">
-    <h2 class="font-bold text-xl opacity-75">New Entry</h2>
-    
-    <span class="text-sm text-text-300">
-      {{ now$ | async | date:'MM-dd-yyyy' }}
-      &nbsp;|&nbsp;
+<div class="entry-card rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Guard Entry</p>
+      <h2 class="mt-1 text-2xl font-semibold text-text-900">New Parking Ticket</h2>
+    </div>
+
+    <div class="w-fit rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
+      {{ now$ | async | date:'MMM d, yyyy' }}
+      <span class="mx-1 text-slate-300">|</span>
       {{ now$ | async | date:'hh:mm:ss a' }}
-    </span>
+    </div>
   </div>
 
-  <div class="mt-4">
-    <form [formGroup]="entryForm" (ngSubmit)="onSubmit()">
-      <div class="md:grid grid-cols-2 gap-8" >
-        <mat-form-field class="w-full" appearance="outline">
-          <mat-label>Vehicle Type</mat-label>
-          <mat-select formControlName="vehicleType">
-            <mat-option value="CAR">CAR</mat-option>
-            <mat-option value="MOTORCYCLE">MOTORCYCLE</mat-option>
-            <mat-option value="TRUCK">TRUCK</mat-option>
-          </mat-select>
-        </mat-form-field>
+  <form [formGroup]="entryForm" (ngSubmit)="onSubmit()" class="mt-5">
+    <div class="grid gap-3 md:grid-cols-[0.8fr_1.2fr]">
+      <mat-form-field class="entry-field w-full" appearance="outline">
+        <mat-label>Vehicle Type</mat-label>
+        <mat-select formControlName="vehicleType">
+          <mat-option value="CAR">CAR</mat-option>
+          <mat-option value="MOTORCYCLE">MOTORCYCLE</mat-option>
+          <mat-option value="TRUCK">TRUCK</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-        <mat-form-field class="w-full" appearance="outline">
-          <mat-label>Plate Number</mat-label>
-          <input matInput formControlName="plateNumber" placeholder="Plate Number">
-        </mat-form-field>
+      <mat-form-field class="entry-field w-full" appearance="outline">
+        <mat-label>Plate Number</mat-label>
+        <input
+          matInput
+          formControlName="plateNumber"
+          placeholder="ABC 1234"
+          autocomplete="off"
+          autocapitalize="characters"
+          class="plate-input"
+        >
+      </mat-form-field>
+    </div>
+
+    <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Rate and tags</p>
+      <div class="mt-1 flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
+        <mat-checkbox
+          [checked]="entryForm.get('rateType')?.value === 'OVERNIGHT'"
+          (change)="entryForm.get('rateType')?.setValue($event.checked ? 'OVERNIGHT' : 'HOURLY')"
+        >
+          Overnight
+        </mat-checkbox>
+        <mat-checkbox [checked]="hasDiscount" (change)="onCheckboxChangePWD($event)" [disabled]="scpwdCheck">
+          PWD/Senior
+        </mat-checkbox>
+        <mat-checkbox [checked]="isDelivery" (change)="onCheckboxChangeDelivery($event)" [disabled]="deliveryCheck">
+          Delivery
+        </mat-checkbox>
       </div>
+    </div>
 
-      <div class="flex flex-col mb-3">
-        <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-8 mb-2">
-          <mat-checkbox [checked]="hasDiscount" (change)="onCheckboxChangePWD($event)" [disabled]="scpwdCheck">PWD/Senior Discount</mat-checkbox>
-          <mat-checkbox [checked]="isDelivery" (change)="onCheckboxChangeDelivery($event)" [disabled]="deliveryCheck">Delivery Vehicle</mat-checkbox>
-          <mat-checkbox 
-            [checked]="entryForm.get('rateType')?.value === 'OVERNIGHT'"
-            (change)="entryForm.get('rateType')?.setValue($event.checked ? 'OVERNIGHT' : 'HOURLY')"
-          >Overnight</mat-checkbox>
-        </div>
-
-        @if (hasDiscount) {
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <mat-form-field class="w-full" appearance="outline">
-              <mat-label>Name</mat-label>
-              <input formControlName="discountHolderName" matInput placeholder="Name">
-            </mat-form-field>
-
-            <mat-form-field class="w-full" appearance="outline">
-              <mat-label>PWD/SC ID</mat-label>
-              <input formControlName="discountIdNumber" matInput placeholder="Enter PWD/SC ID Number">
-            </mat-form-field>
-          </div>
-        }
-      </div>
-
-      <button
-        mat-raised-button
-        color="primary"
-        class="px-4 py-2 rounded-md bg-primary hover:bg-emerald-700 text-white font-bold cursor-pointer"
-        type="submit"
-        [disabled]="isSubmitting || entryForm.invalid"
-      >
-        {{ isSubmitting ? 'Saving...' : 'Enter Parking' }}
-      </button>
-    </form>
-  </div>
+    <button
+      class="mt-4 flex h-14 w-full items-center justify-center rounded-md bg-primary px-4 text-base font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+      type="submit"
+      [disabled]="isSubmitting || entryForm.invalid"
+    >
+      {{ isSubmitting ? 'Saving Ticket...' : 'Enter Parking' }}
+    </button>
+  </form>
 </div>

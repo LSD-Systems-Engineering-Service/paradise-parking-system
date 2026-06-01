@@ -1,25 +1,100 @@
 <section class="main-container pb-16">
-  <h1 class="text-3xl font-medium text-text-900 mt-4">Monthly Breakdown</h1>
-  <mat-form-field appearance="outline" class="w-48 mt-4">
-    <mat-label>Select Month</mat-label>
-    <input matInput [matDatepicker]="dp" [formControl]="dateControl">
-    <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
-    <mat-datepicker #dp
-      startView="year"
-      (monthSelected)="setMonthAndYear($event, dp)"
-      panelClass="month-picker"></mat-datepicker>
-  </mat-form-field>
-  
-  <div class="flex items-center gap-2">
-    <app-button variant="neutral" (click)="exportToCSV()">
-      <lucide-angular [img]="DownloadIcon" class="w-4 h-4 mr-2"></lucide-angular> Export CSV
-    </app-button>
-    <app-button variant="primary" (click)="exportToPDF()">
-      <lucide-angular [img]="DownloadIcon" class="w-4 h-4 mr-2"></lucide-angular> Export PDF
-    </app-button>
+  <div class="mt-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">
+          Reports / Monthly Summary
+        </p>
+        <h1 class="mt-2 text-3xl font-semibold text-text-900">Monthly Breakdown</h1>
+        <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+          Revenue, vehicle mix, rate stream, and daily transaction performance for
+          {{ selectedMonthLabel() }}.
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-3 md:flex-row md:items-center">
+        <mat-form-field appearance="outline" class="month-field">
+          <mat-label>Select Month</mat-label>
+          <input matInput [matDatepicker]="dp" [formControl]="dateControl">
+          <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+          <mat-datepicker
+            #dp
+            startView="year"
+            (monthSelected)="setMonthAndYear($event, dp)"
+            panelClass="month-picker"
+          ></mat-datepicker>
+        </mat-form-field>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="exportToCSV()"
+            [disabled]="isLoading()"
+            class="inline-flex h-11 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <lucide-angular [img]="DownloadIcon" class="h-4 w-4"></lucide-angular>
+            CSV
+          </button>
+          <button
+            type="button"
+            (click)="exportToPDF()"
+            [disabled]="isLoading() || isExportingPdf()"
+            class="inline-flex h-11 items-center gap-2 rounded-md bg-emerald-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+          >
+            <lucide-angular [img]="FileTextIcon" class="h-4 w-4"></lucide-angular>
+            {{ isExportingPdf() ? 'Exporting...' : 'Export PDF' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-5 grid gap-3 border-t border-slate-200 pt-4 text-sm md:grid-cols-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Period</p>
+        <p class="mt-1 font-semibold text-slate-900">{{ selectedMonthLabel() }}</p>
+      </div>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Days With Sales</p>
+        <p class="mt-1 font-semibold text-slate-900">
+          {{ daysWithTransactions() }} active / {{ quietDays() }} quiet
+        </p>
+      </div>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Top Revenue Day</p>
+        @if (topRevenueDay(); as topDay) {
+          <p class="mt-1 font-semibold text-slate-900">
+            {{ topDay.dayLabel }} - {{ topDay.totalRevenue | peso }}
+          </p>
+        } @else {
+          <p class="mt-1 font-semibold text-slate-900">No revenue yet</p>
+        }
+      </div>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Last Updated</p>
+        <p class="mt-1 font-semibold text-slate-900">
+          @if (lastUpdated(); as updated) {
+            {{ updated.toFormat('MMM d, h:mm a') }}
+          } @else {
+            Waiting for data
+          }
+        </p>
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="mt-4 h-1 overflow-hidden rounded-full bg-emerald-100">
+        <div class="loading-bar h-full rounded-full bg-emerald-500"></div>
+      </div>
+    }
   </div>
 
-  <div class="mt-6 grid md:grid-cols-3 gap-6">
+  @if (errorMessage(); as error) {
+    <div class="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+      {{ error }}
+    </div>
+  }
+
+  <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
     <app-stat-card
       [icon]="BanknoteIcon"
       label="Total Revenue"
@@ -30,82 +105,227 @@
       [icon]="TrendingUpIcon"
       label="Avg Daily Revenue"
       [value]="averageDailyRevenue() | peso"
-      iconBgClass="bg-emerald-200 text-emerald-800"
+      iconBgClass="bg-emerald-100 text-emerald-700"
     ></app-stat-card>
 
     <app-stat-card
       [icon]="CarIcon"
       label="Total Entries"
-      [value]="totalEntries()"
-      iconBgClass="bg-blue-200 text-blue-700"
-    ></app-stat-card>
-  </div>
-
-  <div class="mt-4 grid md:grid-cols-3 gap-6">
-    <app-stat-card
-      [icon]="ClockIcon"
-      label="Hourly Revenue"
-      [value]="hourlyRevenue() | peso"
-      iconBgClass="bg-emerald-200 text-emerald-800"
+      [value]="totalEntries().toLocaleString()"
+      iconBgClass="bg-sky-100 text-sky-700"
     ></app-stat-card>
 
     <app-stat-card
-      [icon]="EyeIcon"
-      label="Overnight Revenue"
-      [value]="overnightRevenue() | peso"
-      iconBgClass="bg-amber-200 text-amber-800"
-    ></app-stat-card>
-
-    <app-stat-card
-      [icon]="BanknoteIcon"
-      label="Monthly Availers"
-      [value]="monthlyAvailersRevenue() | peso"
-      iconBgClass="bg-purple-200 text-purple-800"
+      [icon]="CalendarIcon"
+      label="BIR Tagged"
+      [value]="includedInBIRCount().toLocaleString()"
+      iconBgClass="bg-slate-100 text-slate-700"
     ></app-stat-card>
   </div>
 
-  <h2 class="text-2xl font-semibold mt-6">Transaction Logs</h2>
-  <div class="w-full overflow-x-auto bg-white rounded-lg shadow-sm border border-slate-200 mt-2">
-    <table cdk-table [dataSource]="dataSource" class="w-full border-collapse">
-      <ng-container cdkColumnDef="loggedDate">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">DATE</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 font-bold text-sm">{{ element.loggedDate | date:'MM-dd-yyyy' }}</td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="totalEntries">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-center px-6 py-4 text-xs text-white whitespace-nowrap">TOTAL ENTRIES</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-center text-text-600 text-sm">{{ element.totalEntries }}</td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="totalRevenue">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-center px-6 py-4 text-xs text-white whitespace-nowrap">TOTAL REVENUE</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-center text-text-900 font-bold text-sm bg-slate-50">
-          {{ element.totalRevenue | peso }}
-        </td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="view">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-right px-6 py-4 text-xs text-white whitespace-nowrap">VIEW</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-right text-text-600">
-          <div class="flex items-center justify-end">
-            <lucide-angular [img]="EyeIcon" class="w-5 h-5 hover:cursor-pointer hover:text-primary transition-colors" (click)="openReport()"></lucide-angular>
-          </div>
-        </td>
-      </ng-container>
-
-      <tr cdk-header-row *cdkHeaderRowDef="DISPLAYED_COLUMNS" class="bg-secondary"></tr>
-      <tr cdk-row *cdkRowDef="let row; columns: DISPLAYED_COLUMNS;" class="border-b border-slate-200 hover:bg-emerald-50 transition-colors"></tr>
-    </table>
-  </div>
-
-  <div class="mt-8 grid lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-      <h2 class="text-lg font-semibold text-text-900 mb-4">Revenue by Vehicle Type</h2>
-      <div echarts (chartInit)="onVehicleChartInit($event)" [options]="vehicleChartOptions" class="h-[300px]"></div>
+  <div class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,0.9fr)]">
+    <div class="min-w-0 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-text-900">Daily Revenue Trend</h2>
+          <p class="text-sm text-slate-500">Stacked by hourly, overnight, and monthly stream.</p>
+        </div>
+        <span class="w-fit rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+          {{ dailySummaries().length }} days
+        </span>
+      </div>
+      <div
+        echarts
+        (chartInit)="onMonthlyTrendChartInit($event)"
+        [options]="monthlyTrendChartOptions"
+        class="mt-4 h-[360px]"
+      ></div>
     </div>
-    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-      <h2 class="text-lg font-semibold text-text-900 mb-4">Daily Revenue Trend</h2>
-      <div echarts (chartInit)="onMonthlyTrendChartInit($event)" [options]="monthlyTrendChartOptions" class="h-[300px]"></div>
+
+    <div class="min-w-0 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-semibold text-text-900">Revenue Mix</h2>
+      <p class="mt-1 text-sm text-slate-500">A fast read on where the month is coming from.</p>
+
+      <div class="revenue-mix-list mt-5 space-y-4">
+        @for (slice of revenueStreamSlices(); track slice.label) {
+          <div>
+            <div class="mb-1 flex items-center justify-between gap-3 text-sm">
+              <span class="font-semibold text-slate-700">{{ slice.label }}</span>
+              <span [ngClass]="slice.textClass" class="font-semibold">{{ slice.value | peso }}</span>
+            </div>
+            <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+              <div class="h-full rounded-full" [ngClass]="slice.barClass" [style.width.%]="slice.percent"></div>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">{{ slice.percent | number:'1.0-1' }}% of revenue</p>
+          </div>
+        }
+      </div>
+
+      <div class="mt-6 grid grid-cols-3 gap-3 border-t border-slate-200 pt-5 text-center">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Hourly</p>
+          <p class="mt-1 text-sm font-semibold text-slate-900">{{ hourlyRevenue() | peso }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Overnight</p>
+          <p class="mt-1 text-sm font-semibold text-slate-900">{{ overnightRevenue() | peso }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Monthly</p>
+          <p class="mt-1 text-sm font-semibold text-slate-900">{{ monthlyAvailersRevenue() | peso }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+    <div class="min-w-0 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-semibold text-text-900">Vehicle Revenue</h2>
+      <p class="mt-1 text-sm text-slate-500">Revenue contribution by vehicle type.</p>
+      <div
+        echarts
+        (chartInit)="onVehicleChartInit($event)"
+        [options]="vehicleChartOptions"
+        class="mt-4 h-[310px]"
+      ></div>
+    </div>
+
+    <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-semibold text-text-900">Vehicle Mix</h2>
+      <p class="mt-1 text-sm text-slate-500">Entries and revenue by vehicle class.</p>
+
+      <div class="mt-5 grid gap-3 sm:grid-cols-3">
+        <div class="rounded-md border border-emerald-100 bg-emerald-50 p-4">
+          <div class="flex items-center gap-2 text-emerald-700">
+            <lucide-angular [img]="CarIcon" class="h-4 w-4"></lucide-angular>
+            <p class="text-xs font-semibold uppercase tracking-wide">Cars</p>
+          </div>
+          <p class="mt-3 text-2xl font-semibold text-slate-900">{{ carEntries() | number }}</p>
+          <p class="mt-1 text-sm font-medium text-emerald-700">{{ carRevenue() | peso }}</p>
+        </div>
+
+        <div class="rounded-md border border-sky-100 bg-sky-50 p-4">
+          <div class="flex items-center gap-2 text-sky-700">
+            <lucide-angular [img]="MotorbikeIcon" class="h-4 w-4"></lucide-angular>
+            <p class="text-xs font-semibold uppercase tracking-wide">Motorcycles</p>
+          </div>
+          <p class="mt-3 text-2xl font-semibold text-slate-900">{{ motorEntries() | number }}</p>
+          <p class="mt-1 text-sm font-medium text-sky-700">{{ motorRevenue() | peso }}</p>
+        </div>
+
+        <div class="rounded-md border border-amber-100 bg-amber-50 p-4">
+          <div class="flex items-center gap-2 text-amber-700">
+            <lucide-angular [img]="TruckIcon" class="h-4 w-4"></lucide-angular>
+            <p class="text-xs font-semibold uppercase tracking-wide">Trucks</p>
+          </div>
+          <p class="mt-3 text-2xl font-semibold text-slate-900">{{ truckEntries() | number }}</p>
+          <p class="mt-1 text-sm font-medium text-amber-700">{{ truckRevenue() | peso }}</p>
+        </div>
+      </div>
+
+      <div class="mt-5 space-y-3">
+        @for (slice of vehicleRevenueSlices(); track slice.label) {
+          <div class="flex items-center gap-3">
+            <span class="w-24 text-sm font-semibold text-slate-700">{{ slice.label }}</span>
+            <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+              <div class="h-full rounded-full" [ngClass]="slice.barClass" [style.width.%]="slice.percent"></div>
+            </div>
+            <span class="w-12 text-right text-xs font-semibold text-slate-500">
+              {{ slice.percent | number:'1.0-0' }}%
+            </span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 rounded-lg border border-slate-200 bg-white shadow-sm">
+    <div class="flex flex-col gap-2 border-b border-slate-200 px-5 py-4 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-text-900">Daily Transaction Summary</h2>
+        <p class="text-sm text-slate-500">Latest day first, including zero-activity days for audit completeness.</p>
+      </div>
+      <span class="w-fit rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+        {{ transactionCount() | number }} transactions
+      </span>
+    </div>
+
+    <div class="w-full overflow-x-auto">
+      <table cdk-table [dataSource]="dataSource" class="w-full min-w-[980px] border-collapse">
+        <ng-container cdkColumnDef="loggedDate">
+          <th cdk-header-cell *cdkHeaderCellDef class="table-head text-left">Date</th>
+          <td cdk-cell *cdkCellDef="let element" class="table-cell">
+            <p class="font-semibold text-slate-900">{{ element.dayLabel }}, {{ selectedPeriod().year }}</p>
+            <p class="text-xs font-medium text-slate-500">{{ element.dayName }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="totalEntries">
+          <th cdk-header-cell *cdkHeaderCellDef class="table-head text-right">Entries</th>
+          <td cdk-cell *cdkCellDef="let element" class="table-cell text-right">
+            <span
+              class="rounded-md px-2 py-1 text-xs font-semibold"
+              [ngClass]="element.totalEntries > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'"
+            >
+              {{ element.totalEntries | number }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="vehicleMix">
+          <th cdk-header-cell *cdkHeaderCellDef class="table-head text-center">Vehicle Mix</th>
+          <td cdk-cell *cdkCellDef="let element" class="table-cell">
+            <div class="flex items-center justify-center gap-2 text-xs font-semibold text-slate-700">
+              <span class="rounded bg-emerald-50 px-2 py-1 text-emerald-700">C {{ element.carAmount }}</span>
+              <span class="rounded bg-sky-50 px-2 py-1 text-sky-700">M {{ element.motorAmount }}</span>
+              <span class="rounded bg-amber-50 px-2 py-1 text-amber-700">T {{ element.truckAmount }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="revenueStreams">
+          <th cdk-header-cell *cdkHeaderCellDef class="table-head text-left">Revenue Streams</th>
+          <td cdk-cell *cdkCellDef="let element" class="table-cell">
+            <div class="grid gap-1 text-xs text-slate-600">
+              <span>Hourly: <strong class="text-slate-900">{{ element.hourlyRevenue | peso }}</strong></span>
+              <span>Overnight: <strong class="text-slate-900">{{ element.overnightRevenue | peso }}</strong></span>
+              <span>Monthly: <strong class="text-slate-900">{{ element.monthlyStreamRevenue | peso }}</strong></span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="averageTicket">
+          <th cdk-header-cell *cdkHeaderCellDef class="table-head text-right">Avg Ticket</th>
+          <td cdk-cell *cdkCellDef="let element" class="table-cell text-right text-sm font-semibold text-slate-700">
+            {{ element.averageTicket | peso }}
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="totalRevenue">
+          <th cdk-header-cell *cdkHeaderCellDef class="table-head text-right">Total Revenue</th>
+          <td cdk-cell *cdkCellDef="let element" class="table-cell bg-slate-50 text-right text-sm font-bold text-slate-900">
+            {{ element.totalRevenue | peso }}
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="view">
+          <th cdk-header-cell *cdkHeaderCellDef class="table-head text-right">View</th>
+          <td cdk-cell *cdkCellDef="let element" class="table-cell text-right">
+            <button
+              type="button"
+              (click)="openReport(element)"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+              title="View daily summary"
+            >
+              <lucide-angular [img]="EyeIcon" class="h-4 w-4"></lucide-angular>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr cdk-header-row *cdkHeaderRowDef="displayedColumns" class="bg-slate-900"></tr>
+        <tr cdk-row *cdkRowDef="let row; columns: displayedColumns;" class="border-b border-slate-100 transition hover:bg-emerald-50/50"></tr>
+      </table>
     </div>
   </div>
 </section>
+

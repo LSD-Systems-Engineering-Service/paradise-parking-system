@@ -1,4 +1,4 @@
-import { PaymentStatus, VehicleType } from "../../../../graphql/generated/graphql";
+import { PaymentStatus, RateType, VehicleType } from "../../../../graphql/generated/graphql";
 import { PaginatedResponse } from "../../../shared/types/paginated-response.type";
 
 export interface ParkingSession {
@@ -9,6 +9,8 @@ export interface ParkingSession {
   exitedAt?: string | null;
   durationMinutes?: number | null;
   paymentStatus: PaymentStatus
+  parkingFee?: number | null;
+  rateType: RateType;
 }
 
 export interface ParkingSessionsByParkingStateResponse {

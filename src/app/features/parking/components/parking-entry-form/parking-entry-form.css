@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep .entry-field .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.entry-card {
+  scroll-margin-top: 1rem;
+}
+
+.plate-input {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

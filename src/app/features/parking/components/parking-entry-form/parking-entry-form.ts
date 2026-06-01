@@ -1,4 +1,4 @@
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 
@@ -49,7 +49,6 @@ export class ParkingEntryForm {
   onCheckboxChangePWD(event: MatCheckboxChange){
     this.hasDiscount = event.checked;
     
-    console.log('Status', event.checked)
     if (this.hasDiscount) {
       this.deliveryCheck = true;
       // this.entryForm.get('discountHolderName')?.setValidators([Validators.required]);
@@ -69,12 +68,9 @@ export class ParkingEntryForm {
 
   onCheckboxChangeDelivery(event: MatCheckboxChange){
     this.isDelivery = event.checked;
-    console.log('Status', event.checked)
     if (this.isDelivery) {
       this.scpwdCheck = true;
-      console.log("Is Delivery")
     } else {
-      console.log("Is NOT Delivery")
       this.scpwdCheck = false;
     }
   }
@@ -85,18 +81,34 @@ export class ParkingEntryForm {
   );  
 
   onSubmit() {
-    if (this.entryForm.invalid) return;
-    this.isSubmitting = true;
-    console.log(this.entryForm.value);
+    if (this.entryForm.invalid) {
+      this.entryForm.markAllAsTouched();
+      return;
+    }
 
-    this.parkingService.createParkingSession(this.entryForm.value, getTodayISO()).pipe(
+    this.isSubmitting = true;
+    const formValue = this.entryForm.value;
+    const input = {
+      vehicleType: formValue.vehicleType,
+      plateNumber: String(formValue.plateNumber).trim().toUpperCase(),
+      rateType: formValue.rateType,
+    };
+
+    this.parkingService.createParkingSession(input, getTodayISO()).pipe(
       finalize(() => {
         this.isSubmitting = false;
       })
     ).subscribe({
       next: (response) => {
-        console.log('Parking created:', response);
-        this.entryForm.reset();
+        this.entryForm.reset({
+          vehicleType: '',
+          plateNumber: '',
+          rateType: 'HOURLY',
+        });
+        this.hasDiscount = false;
+        this.isDelivery = false;
+        this.scpwdCheck = false;
+        this.deliveryCheck = false;
       },
       error: (err) => {
         console.error(err);

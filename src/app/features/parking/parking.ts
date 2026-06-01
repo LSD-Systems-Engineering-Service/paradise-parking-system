@@ -17,11 +17,23 @@ import { ParkingService } from './services/parking.service';
 import { QueryState } from '../../core/models/graphql-response.model';
 import { ParkingSession } from './models/parking-session.model';
 
-import { CalendarDays, Car, Clock3, EllipsisVertical, LucideAngularModule, Motorbike, MoonStar, ScanQrCode, Truck } from 'lucide-angular';
+import {
+  CalendarDays,
+  Car,
+  Clock3,
+  EllipsisVertical,
+  LogOut,
+  LucideAngularModule,
+  Motorbike,
+  MoonStar,
+  Printer,
+  ScanQrCode,
+  Search,
+  Truck,
+} from 'lucide-angular';
 import { PaginatedResponse } from '../../shared/types/paginated-response.type';
 import { ParkingEntryForm } from "./components/parking-entry-form/parking-entry-form";
 import { ExitConfirmationDialog } from './components/exit-confirmation-dialog/exit-confirmation-dialog';
-import { Button } from '../../shared/ui/button/button';
 import { PARKING_MESSAGES } from './constants/parking.constants';
 import { getTodayISO } from '../../shared/utils/date.utils';
 import { ParkingStatistics } from '../../../graphql/generated/graphql';
@@ -41,7 +53,6 @@ type SessionState = 'ACTIVE' | 'EXITED';
     ParkingEntryForm,
     MatDialogModule,
     RouterLink,
-    Button,
     MatPaginator,
     MatMenuModule,
     PesoPipe
@@ -55,6 +66,9 @@ export class Parking {
   readonly Motorbike = Motorbike;
   readonly Truck = Truck;
   readonly ScanQrCode = ScanQrCode;
+  readonly Search = Search;
+  readonly Printer = Printer;
+  readonly LogOut = LogOut;
   readonly ellipsisVertical = EllipsisVertical;
 
   readonly RateHourly = Clock3;
@@ -89,6 +103,26 @@ export class Parking {
 
   stats: ParkingStatistics | null = null;
 
+  get activeSessions(): ParkingSession[] {
+    return this.sessionManagers.active.dataSource.data;
+  }
+
+  get exitedSessions(): ParkingSession[] {
+    return this.sessionManagers.exited.dataSource.data;
+  }
+
+  get activeCarCount(): number {
+    return this.countActiveVehicle('CAR');
+  }
+
+  get activeMotorcycleCount(): number {
+    return this.countActiveVehicle('MOTORCYCLE');
+  }
+
+  get activeTruckCount(): number {
+    return this.countActiveVehicle('TRUCK');
+  }
+
   ngOnInit(): void {
     this.loadSessions('ACTIVE');
     this.loadSessions('EXITED');
@@ -116,7 +150,6 @@ export class Parking {
     ).subscribe({
       next: (response) => {
         manager.dataSource.data = response.data;
-        console.log(manager.dataSource.data)
         manager.state.loading = false;  
 
       },
@@ -153,7 +186,6 @@ export class Parking {
           totalEntriesToday: stats.totalEntriesToday ?? 0,
         };
 
-        console.log(this.stats);
       },
       error: (err) => {
         console.error('Error fetching parking statistics:', err);
@@ -169,12 +201,12 @@ export class Parking {
     dialogRef.afterClosed().subscribe((confirmed) => {
       if (!confirmed) return;
 
-      console.log("exited")
-      console.log("")
-
       this.parkingService.exitParkingSession(element.id, getTodayISO()).subscribe({
         next: (response) => {
           this.snackBar.open(PARKING_MESSAGES.EXIT_SUCCESS, 'Close');
+          this.loadSessions('ACTIVE');
+          this.loadSessions('EXITED');
+          this.fetchParkingStatistics();
         },
         error: (error) => {
           console.error('Error exiting session:', error);
@@ -197,7 +229,6 @@ export class Parking {
   }
 
   handleRetryExitPrint(sessionId: string): void {
-    console.log(sessionId)
     this.parkingService.retryPrintExitTicket(sessionId).subscribe({
       next: (response) => {
         this.snackBar.open(PARKING_MESSAGES.PRINT_SUCCESS, 'Close');
@@ -215,5 +246,29 @@ export class Parking {
       ? this.sessionManagers.active.dataSource 
       : this.sessionManagers.exited.dataSource;
     dataSource.filter = filterValue;
+  }
+
+  getRateTypeClasses(rateType: string): string {
+    const classes: Record<string, string> = {
+      HOURLY: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+      OVERNIGHT: 'bg-sky-50 border-sky-200 text-sky-800',
+      MONTHLY: 'bg-amber-50 border-amber-200 text-amber-800',
+    };
+
+    return classes[rateType] ?? 'bg-slate-50 border-slate-200 text-slate-700';
+  }
+
+  getPaymentStatusClasses(status: string): string {
+    const classes: Record<string, string> = {
+      PAID: 'bg-emerald-100 border-emerald-300 text-emerald-800',
+      OVERDUE: 'bg-red-100 border-red-300 text-red-800',
+      UNPAID: 'bg-slate-100 border-slate-300 text-slate-700',
+    };
+
+    return classes[status] ?? 'bg-slate-100 border-slate-300 text-slate-700';
+  }
+
+  private countActiveVehicle(vehicleType: string): number {
+    return this.activeSessions.filter(session => session.vehicleType === vehicleType).length;
   }
 }

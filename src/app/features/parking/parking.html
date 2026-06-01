@@ -1,311 +1,460 @@
-<section class="min-h-screen main-container pb-16">
-  <div class="my-6 flex gap-4 items-center">
-    <div class="bg-primary p-2.5 rounded-lg">
-      <lucide-angular [img]="Car" class="w-8 h-8 text-white"></lucide-angular>
+<section class="parking-page main-container min-h-screen pb-16">
+  <div class="my-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-3">
+      <div class="rounded-lg bg-primary p-2.5 shadow-sm">
+        <lucide-angular [img]="Car" class="h-7 w-7 text-white"></lucide-angular>
+      </div>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Guard Console</p>
+        <h1 class="text-2xl font-semibold text-text-900">Parking Management</h1>
+        <p class="mt-0.5 text-sm text-text-300">Entry, exit, and ticket reprint operations</p>
+      </div>
     </div>
-    <div>
-      <h1 class="text-2xl text-text-900">Parking Management</h1>
-      <p class="mt-0.5 text-[16px] opacity-75 text-text-300">Track and manage vehicle parking</p>
-    </div>
+
+    <!-- <a
+      [routerLink]="['/parking/exit-scan']"
+      class="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-slate-900 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800"
+    >
+      <lucide-angular [img]="ScanQrCode" class="h-5 w-5"></lucide-angular>
+      Scan Exit QR
+    </a> -->
   </div>
 
   <app-parking-entry-form></app-parking-entry-form>
 
-  <img src="/images/banners/active-banner.png" alt="Active Banner" class="hidden md:block w-full rounded-lg mt-6" />
-  <img src="/images/banners/active-banner-mobile.png" alt="Active Banner" class="md:hidden w-full rounded-lg mt-6" />
+  <img src="/images/banners/active-banner.png" alt="Active Banner" class="mt-6 hidden w-full rounded-lg md:block" />
+  <img src="/images/banners/active-banner-mobile.png" alt="Active Banner" class="mt-6 w-full rounded-lg md:hidden" />
 
-  <div class="mt-6 grid md:grid-cols-4 gap-4">
-    <div class="flex items-center justify-between text-end gap-4 bg-white rounded-lg shadow-sm border border-slate-200 p-5">
-      <img src="/images/icons/car.png" alt="Car Icon" class="h-13">
-      <div>
-        <p class="text-text-300">PARKED CARS</p>
-        <p class="text-text-900 font-bold mt-1 text-xl">
-          {{ stats?.parkedVehicles ?? 0 }}
-        </p>
+  <div class="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+    <div class="parking-stat-card">
+      <img src="/images/icons/car.png" alt="Car Icon" class="h-12">
+      <div class="text-right">
+        <p class="parking-stat-label">Active Cars</p>
+        <p class="parking-stat-value">{{ activeCarCount }}</p>
       </div>
     </div>
 
-    <div class="flex items-center justify-between text-end gap-4 bg-white rounded-lg shadow-sm border border-slate-200 p-5">
-      <img src="/images/icons/motor.png" alt="Car Icon" class="h-16">
-      <div>
-        <p class="text-text-300">PARKED MOTORCYCLES</p>
-        <p class="text-text-900 font-bold mt-1 text-xl">
-          {{ stats?.parkedMotorcycles ?? 0 }}
-        </p>
+    <div class="parking-stat-card">
+      <img src="/images/icons/motor.png" alt="Motorcycle Icon" class="h-14">
+      <div class="text-right">
+        <p class="parking-stat-label">Active Motors</p>
+        <p class="parking-stat-value">{{ activeMotorcycleCount }}</p>
       </div>
     </div>
 
-    <div class="flex items-center justify-between text-end gap-4 bg-white rounded-lg shadow-sm border border-slate-200 p-5">
-      <img src="/images/icons/truck.png" alt="Car Icon" class="h-13">
-      <div>
-        <p class="text-text-300">PARKED TRUCK</p>
-        <p class="text-text-900 font-bold mt-1 text-xl">
-          0
-        </p>
+    <div class="parking-stat-card">
+      <img src="/images/icons/truck.png" alt="Truck Icon" class="h-12">
+      <div class="text-right">
+        <p class="parking-stat-label">Active Trucks</p>
+        <p class="parking-stat-value">{{ activeTruckCount }}</p>
       </div>
     </div>
 
-    <div class="flex items-center justify-between text-end gap-4 bg-white rounded-lg shadow-sm border border-slate-200 p-5">
-      <img src="/images/icons/delivery.png" alt="Car Icon" class="h-13">
-      <div>
-        <p class="text-text-300">PARKED DELIVERY VEHICLE</p>
-        <p class="text-text-900 font-bold mt-1 text-xl">
-          0
-        </p>
+    <div class="parking-stat-card">
+      <img src="/images/icons/delivery.png" alt="Delivery Icon" class="h-12">
+      <div class="text-right">
+        <p class="parking-stat-label">Delivery</p>
+        <p class="parking-stat-value">0</p>
       </div>
     </div>
   </div>
 
-  <div class="flex gap-3 items-center">
-    <mat-form-field appearance="outline" class="w-full h-full mt-6">
-      <mat-label>Filter</mat-label>
-      <input matInput (keyup)="applyFilter($event, 'ACTIVE')" placeholder="Search by Plate or vehicle type..." #input>
-    </mat-form-field>
-  </div>
-
-  <div class="w-full overflow-x-auto bg-white rounded-lg shadow-sm border border-slate-200">
-    <table cdk-table [dataSource]="sessionManagers.active.dataSource" class="w-full border-collapse">
-      <ng-container cdkColumnDef="vehicleType">
-        <th cdk-header-cell *cdkHeaderCellDef></th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm w-32">
-          <div
-            class="flex items-center justify-center w-10 h-10 rounded-full border"
-            [ngClass]="{
-              'bg-emerald-50 border-emerald-200 text-emerald-700': element.vehicleType === 'CAR',
-              'bg-sky-50 border-sky-200 text-sky-700': element.vehicleType === 'MOTORCYCLE',
-              'bg-amber-50 border-amber-200 text-amber-700': element.vehicleType === 'TRUCK'
-            }"
-          >
-            @if (element.vehicleType == 'CAR') {
-              <lucide-angular [img]="Car" class="w-5 h-5"></lucide-angular>
-            } @else if (element.vehicleType == 'MOTORCYCLE') {
-              <lucide-angular [img]="Motorbike" class="w-5 h-5"></lucide-angular>
-            } @else {
-              <lucide-angular [img]="Truck" class="w-5 h-5"></lucide-angular>
-            }
-          </div>
-        </td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="rateType">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">RATE TYPE</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
-          <div class="inline-flex items-center gap-2 rounded-sm px-3 py-1.5 border text-xs font-medium"
-            [ngClass]="{
-              'bg-emerald-50 border-emerald-200 text-emerald-800': element.rateType === 'HOURLY',
-              'bg-sky-50 border-sky-200 text-sky-800': element.rateType === 'OVERNIGHT',
-              'bg-amber-50 border-amber-200 text-amber-800': element.rateType === 'MONTHLY'
-            }"
-          >
-            @if (element.rateType === 'HOURLY') {
-              <lucide-angular [img]="RateHourly" class="w-4 h-4"></lucide-angular>
-            } @else if (element.rateType === 'OVERNIGHT') {
-              <lucide-angular [img]="RateOvernight" class="w-4 h-4"></lucide-angular>
-            } @else if (element.rateType === 'MONTHLY') {
-              <lucide-angular [img]="RateMonthly" class="w-4 h-4"></lucide-angular>
-            }
-            <span>{{ element.rateType | titlecase }}</span>
-          </div>
-        </td>
-      </ng-container>
-      
-      <ng-container cdkColumnDef="plateNumber">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">PLATE NUMBER</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 font-bold text-sm">{{element.plateNumber}}</td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="enteredAt">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">ENTERED AT</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
-          {{ element.enteredAt | date:'MM-dd-yyyy, y hh:mm a' }}
-        </td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="status">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">STATUS</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600">
-          <span class="px-3 py-2 rounded-md text-text-900 text-xs border"
-            [ngClass]="{'bg-emerald-300 border-emerald-700': element.paymentStatus === 'PAID', 'bg-red-300 border-red-700': element.paymentStatus === 'OVERDUE', 'bg-slate-300 border-slate-700': element.paymentStatus === 'UNPAID'}"
-          >
-            {{ element.paymentStatus }}
-          </span>
-        </td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="actions">
-        <th cdk-header-cell *cdkHeaderCellDef class="px-8 py-4 text-xs text-white whitespace-nowrap text-right">ACTIONS</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600"> 
-          <div class="flex items-center justify-end gap-4">
-            <app-button variant="danger" (click)="exitSession(element)">Exit</app-button>
-            <app-button (click)="handleRetryEntryPrint(element.id)" class="whitespace-nowrap">Retry Print</app-button>
-            <lucide-angular [img]="ellipsisVertical" class="w-6 h-6" [matMenuTriggerFor]="menu"></lucide-angular>
-            <mat-menu #menu="matMenu">
-              <button mat-menu-item>Void</button>
-              <button mat-menu-item>Unsetled</button>
-            </mat-menu>
-          </div>
-        </td>
-      </ng-container>
-
-      <tr cdk-header-row *cdkHeaderRowDef="ACTIVE_SESSION_COLUMNS" class="bg-secondary"></tr>
-      <tr cdk-row *cdkRowDef="let row; columns: ACTIVE_SESSION_COLUMNS;" class="border-b border-slate-200 hover:bg-emerald-50 transition-colors"></tr>
-    </table>
-
-    <mat-paginator 
-      #activeSessionsPaginator
-      [pageSizeOptions]="[5, 10, 25, 100]" 
-      aria-label="Select page of active sessions">
-    </mat-paginator>
-  </div>
-
-  <img src="/images/banners/exited-banner.png" alt="Exited Banner" class="hidden md:block w-full rounded-lg mt-6" />
-  <img src="/images/banners/exited-banner-mobile.png" alt="Exited Banner" class="md:hidden w-full rounded-lg mt-6" />
-
-  <div class="flex gap-3 items-center">
-    <mat-form-field appearance="outline" class="w-full h-full mt-6">
-      <mat-label>Filter</mat-label>
-      <input matInput (keyup)="applyFilter($event, 'EXITED')" placeholder="Search by Plate or vehicle type..." #input>
-    </mat-form-field>
-    <lucide-angular [img]="ScanQrCode" class="w-12 h-12 cursor-pointer" routerLink="parking/exit-scan"></lucide-angular>
-  </div>
-  
-  <div class="w-full overflow-x-auto bg-white rounded-lg shadow-sm border border-slate-200">
-    <table cdk-table [dataSource]="sessionManagers.exited.dataSource" class="w-full border-collapse">
-      <ng-container cdkColumnDef="vehicleType">
-        <th cdk-header-cell *cdkHeaderCellDef></th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm w-32">
-          <div
-            class="flex items-center justify-center w-10 h-10 rounded-full border"
-            [ngClass]="{
-              'bg-emerald-50 border-emerald-200 text-emerald-700': element.vehicleType === 'CAR',
-              'bg-sky-50 border-sky-200 text-sky-700': element.vehicleType === 'MOTORCYCLE',
-              'bg-amber-50 border-amber-200 text-amber-700': element.vehicleType === 'TRUCK'
-            }"
-          >
-            @if (element.vehicleType == 'CAR') {
-              <lucide-angular [img]="Car" class="w-5 h-5"></lucide-angular>
-            } @else if (element.vehicleType == 'MOTORCYCLE') {
-              <lucide-angular [img]="Motorbike" class="w-5 h-5"></lucide-angular>
-            } @else {
-              <lucide-angular [img]="Truck" class="w-5 h-5"></lucide-angular>
-            }
-          </div>
-        </td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="rateType">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">RATE TYPE</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">
-          <div
-            class="inline-flex items-center gap-2 rounded-sm px-3 py-1.5 border text-xs font-medium"
-            [ngClass]="{
-              'bg-emerald-50 border-emerald-200 text-emerald-800': element.rateType === 'HOURLY',
-              'bg-sky-50 border-sky-200 text-sky-800': element.rateType === 'OVERNIGHT',
-              'bg-amber-50 border-amber-200 text-amber-800': element.rateType === 'MONTHLY'
-            }"
-          >
-            @if (element.rateType === 'HOURLY') {
-              <lucide-angular [img]="RateHourly" class="w-4 h-4"></lucide-angular>
-            } @else if (element.rateType === 'OVERNIGHT') {
-              <lucide-angular [img]="RateOvernight" class="w-4 h-4"></lucide-angular>
-            } @else if (element.rateType === 'MONTHLY') {
-              <lucide-angular [img]="RateMonthly" class="w-4 h-4"></lucide-angular>
-            }
-            <span>{{ element.rateType | titlecase }}</span>
-          </div>
-        </td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="plateNumber">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">PLATE NUMBER</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 font-bold text-sm">{{ element.plateNumber }}</td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="enteredAt">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">ENTERED AT</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm whitespace-nowrap">
-          {{ element.enteredAt | date:'MM-dd, hh:mm a' }}
-        </td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="exitedAt">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">EXITED AT</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm whitespace-nowrap">
-          {{ element.exitedAt | date:'MM-dd, hh:mm a' }}
-        </td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="duration">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">DURATION</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm">{{ formatMinutes(element.durationMinutes) }}</td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="fee">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">FEE</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600 text-sm"> {{ element.parkingFee | peso }} </td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="status">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-left px-6 py-4 text-xs text-white whitespace-nowrap">STATUS</th>
-        <td cdk-cell *cdkCellDef="let element" class="px-6 py-4 text-text-600">
-          <span 
-            class="px-3 py-2 rounded-md text-text-900 text-xs border"
-            [ngClass]="{'bg-emerald-300 border-emerald-700': element.paymentStatus === 'PAID', 'bg-red-300 border-red-700': element.paymentStatus === 'OVERDUE', 'bg-slate-300 border-slate-700': element.paymentStatus === 'UNPAID'}"
-          >
-            {{ element.paymentStatus }}
-          </span>
-        </td>
-      </ng-container>
-
-      <ng-container cdkColumnDef="actions">
-        <th cdk-header-cell *cdkHeaderCellDef class="text-right px-6 py-4 text-xs text-white whitespace-nowrap">ACTIONS</th>
-        <td cdk-cell *cdkCellDef="let element" class="text-right px-6 py-4 text-text-600">
-          <app-button (click)="handleRetryExitPrint(element.id)" class="whitespace-nowrap">Retry Print</app-button>
-        </td>
-      </ng-container>
-
-      <tr cdk-header-row *cdkHeaderRowDef="EXITED_SESSION_COLUMNS" class="bg-secondary"></tr>
-      <tr cdk-row *cdkRowDef="let row; columns: EXITED_SESSION_COLUMNS;" class="border-b border-slate-200 hover:bg-emerald-50 transition-colors"></tr>
-    </table>
-
-    <mat-paginator 
-      #exitedSessionsPaginator
-      [pageSizeOptions]="[5, 10, 25, 100]" 
-      aria-label="Select page of exited sessions">
-    </mat-paginator>
-    
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-    <div class="flex items-center justify-between bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+  <section class="mt-5 rounded-lg border border-slate-200 bg-white shadow-sm">
+    <div class="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <p class="text-text-300">Revenue Today</p>
-        <p class="text-text-900 font-bold mt-1">
-          {{ stats?.revenueToday ?? 0 | peso }}
-        </p>
+        <h2 class="text-lg font-semibold text-text-900">Active Vehicles</h2>
+        <p class="text-sm text-slate-500">{{ activeSessions.length }} vehicles currently inside</p>
       </div>
-      <img src="/images/icons/revenue.png" alt="Revenue Icon" class="h-16">
+
+      <div class="flex items-center gap-2">
+        <mat-form-field appearance="outline" class="parking-search-field w-full sm:w-72">
+          <mat-label>Search active</mat-label>
+          <input matInput (keyup)="applyFilter($event, 'ACTIVE')" placeholder="Plate or vehicle type">
+        </mat-form-field>
+      </div>
     </div>
 
-    <div class="flex items-center justify-between bg-white rounded-lg shadow-sm border border-slate-200 p-5">
-      <div>
-        <p class="text-text-300">Currently Parked</p>
-        <p class="text-text-900 font-bold mt-1">
-          {{ stats?.currentlyParked ?? 0 }} Vehicles
-        </p>
-      </div>
-      <img src="/images/icons/parked.png" alt="Revenue Icon" class="h-16">
+    <div class="p-4 md:hidden">
+      @if (sessionManagers.active.state.loading) {
+        <div class="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">
+          Loading active vehicles...
+        </div>
+      } @else if (activeSessions.length === 0) {
+        <div class="rounded-md border border-dashed border-slate-300 bg-slate-50 p-5 text-center">
+          <p class="font-semibold text-slate-800">No active vehicles</p>
+          <p class="mt-1 text-sm text-slate-500">New entries will appear here after ticket creation.</p>
+        </div>
+      } @else {
+        <div class="space-y-3">
+          @for (element of activeSessions; track element.id) {
+            <article class="mobile-session-card">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex min-w-0 items-center gap-3">
+                  <div
+                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border"
+                    [ngClass]="{
+                      'bg-emerald-50 border-emerald-200 text-emerald-700': element.vehicleType === 'CAR',
+                      'bg-sky-50 border-sky-200 text-sky-700': element.vehicleType === 'MOTORCYCLE',
+                      'bg-amber-50 border-amber-200 text-amber-700': element.vehicleType === 'TRUCK'
+                    }"
+                  >
+                    @if (element.vehicleType == 'CAR') {
+                      <lucide-angular [img]="Car" class="h-5 w-5"></lucide-angular>
+                    } @else if (element.vehicleType == 'MOTORCYCLE') {
+                      <lucide-angular [img]="Motorbike" class="h-5 w-5"></lucide-angular>
+                    } @else {
+                      <lucide-angular [img]="Truck" class="h-5 w-5"></lucide-angular>
+                    }
+                  </div>
+                  <div class="min-w-0">
+                    <p class="truncate text-2xl font-bold tracking-wide text-slate-950">{{ element.plateNumber }}</p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ element.vehicleType | titlecase }}</p>
+                  </div>
+                </div>
+
+                <span class="session-pill" [ngClass]="getRateTypeClasses(element.rateType)">
+                  @if (element.rateType === 'HOURLY') {
+                    <lucide-angular [img]="RateHourly" class="h-3.5 w-3.5"></lucide-angular>
+                  } @else if (element.rateType === 'OVERNIGHT') {
+                    <lucide-angular [img]="RateOvernight" class="h-3.5 w-3.5"></lucide-angular>
+                  } @else if (element.rateType === 'MONTHLY') {
+                    <lucide-angular [img]="RateMonthly" class="h-3.5 w-3.5"></lucide-angular>
+                  }
+                  {{ element.rateType | titlecase }}
+                </span>
+              </div>
+
+              <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+                <div class="rounded-md bg-slate-50 p-3">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Entered</p>
+                  <p class="mt-1 font-semibold text-slate-900">{{ element.enteredAt | date:'MMM d, h:mm a' }}</p>
+                </div>
+                <div class="rounded-md bg-slate-50 p-3">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Payment</p>
+                  <span class="mt-1 inline-flex rounded-md border px-2 py-1 text-xs font-bold" [ngClass]="getPaymentStatusClasses(element.paymentStatus)">
+                    {{ element.paymentStatus }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="mt-3 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  (click)="exitSession(element)"
+                  class="touch-action bg-red-600 text-white hover:bg-red-700"
+                >
+                  <lucide-angular [img]="LogOut" class="h-4 w-4"></lucide-angular>
+                  Exit
+                </button>
+                <button
+                  type="button"
+                  (click)="handleRetryEntryPrint(element.id)"
+                  class="touch-action border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+                >
+                  <lucide-angular [img]="Printer" class="h-4 w-4"></lucide-angular>
+                  Print
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      }
     </div>
 
-    <div class="flex items-center justify-between bg-white rounded-lg shadow-sm border border-slate-200 p-5">
-      <div>
-        <p class="text-text-300">Total Entries Today</p>
-        <p class="text-text-900 font-bold mt-1">
-          {{ stats?.totalEntriesToday ?? 0 }}
-        </p>
-      </div>
-      <img src="/images/icons/entries.png" alt="Entries Icon" class="h-16">
+    <div class="hidden w-full overflow-x-auto md:block">
+      <table cdk-table [dataSource]="sessionManagers.active.dataSource" class="w-full min-w-[900px] border-collapse">
+        <ng-container cdkColumnDef="vehicleType">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head w-20"></th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell">
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-full border"
+              [ngClass]="{
+                'bg-emerald-50 border-emerald-200 text-emerald-700': element.vehicleType === 'CAR',
+                'bg-sky-50 border-sky-200 text-sky-700': element.vehicleType === 'MOTORCYCLE',
+                'bg-amber-50 border-amber-200 text-amber-700': element.vehicleType === 'TRUCK'
+              }"
+            >
+              @if (element.vehicleType == 'CAR') {
+                <lucide-angular [img]="Car" class="h-5 w-5"></lucide-angular>
+              } @else if (element.vehicleType == 'MOTORCYCLE') {
+                <lucide-angular [img]="Motorbike" class="h-5 w-5"></lucide-angular>
+              } @else {
+                <lucide-angular [img]="Truck" class="h-5 w-5"></lucide-angular>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="rateType">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-left">Rate</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell">
+            <div class="session-pill" [ngClass]="getRateTypeClasses(element.rateType)">
+              @if (element.rateType === 'HOURLY') {
+                <lucide-angular [img]="RateHourly" class="h-4 w-4"></lucide-angular>
+              } @else if (element.rateType === 'OVERNIGHT') {
+                <lucide-angular [img]="RateOvernight" class="h-4 w-4"></lucide-angular>
+              } @else if (element.rateType === 'MONTHLY') {
+                <lucide-angular [img]="RateMonthly" class="h-4 w-4"></lucide-angular>
+              }
+              <span>{{ element.rateType | titlecase }}</span>
+            </div>
+          </td>
+        </ng-container>
+        
+        <ng-container cdkColumnDef="plateNumber">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-left">Plate</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell text-base font-bold tracking-wide text-slate-900">{{ element.plateNumber }}</td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="enteredAt">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-left">Entered</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell whitespace-nowrap">
+            {{ element.enteredAt | date:'MMM d, h:mm a' }}
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="status">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-left">Status</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell">
+            <span class="rounded-md border px-3 py-1.5 text-xs font-bold" [ngClass]="getPaymentStatusClasses(element.paymentStatus)">
+              {{ element.paymentStatus }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="actions">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-right">Actions</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell"> 
+            <div class="flex items-center justify-end gap-2">
+              <button type="button" class="table-action bg-red-600 text-white hover:bg-red-700" (click)="exitSession(element)">
+                <lucide-angular [img]="LogOut" class="h-4 w-4"></lucide-angular>
+                Exit
+              </button>
+              <button type="button" class="table-action border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100" (click)="handleRetryEntryPrint(element.id)">
+                <lucide-angular [img]="Printer" class="h-4 w-4"></lucide-angular>
+                Retry Print
+              </button>
+              <button type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100" [matMenuTriggerFor]="menu">
+                <lucide-angular [img]="ellipsisVertical" class="h-5 w-5"></lucide-angular>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item>Void</button>
+                <button mat-menu-item>Unsettled</button>
+              </mat-menu>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr cdk-header-row *cdkHeaderRowDef="ACTIVE_SESSION_COLUMNS" class="bg-slate-900"></tr>
+        <tr cdk-row *cdkRowDef="let row; columns: ACTIVE_SESSION_COLUMNS;" class="border-b border-slate-100 transition hover:bg-emerald-50"></tr>
+      </table>
+
+      <mat-paginator 
+        #activeSessionsPaginator
+        [pageSizeOptions]="[5, 10, 25, 100]" 
+        aria-label="Select page of active sessions">
+      </mat-paginator>
     </div>
-    
+  </section>
+
+  <img src="/images/banners/exited-banner.png" alt="Exited Banner" class="mt-6 hidden w-full rounded-lg md:block" />
+  <img src="/images/banners/exited-banner-mobile.png" alt="Exited Banner" class="mt-6 w-full rounded-lg md:hidden" />
+
+  <section class="mt-5 rounded-lg border border-slate-200 bg-white shadow-sm">
+    <div class="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-text-900">Exited Today</h2>
+        <p class="text-sm text-slate-500">{{ exitedSessions.length }} completed sessions</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <mat-form-field appearance="outline" class="parking-search-field w-full sm:w-72">
+          <mat-label>Search exited</mat-label>
+          <input matInput (keyup)="applyFilter($event, 'EXITED')" placeholder="Plate or vehicle type">
+        </mat-form-field>
+        <a
+          [routerLink]="['/parking/exit-scan']"
+          class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-emerald-600 text-white shadow-sm transition hover:bg-emerald-700"
+          title="Scan exit QR"
+        >
+          <lucide-angular [img]="ScanQrCode" class="h-6 w-6"></lucide-angular>
+        </a>
+      </div>
+    </div>
+
+    <div class="p-4 md:hidden">
+      @if (sessionManagers.exited.state.loading) {
+        <div class="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-600">
+          Loading completed exits...
+        </div>
+      } @else if (exitedSessions.length === 0) {
+        <div class="rounded-md border border-dashed border-slate-300 bg-slate-50 p-5 text-center">
+          <p class="font-semibold text-slate-800">No exited vehicles yet</p>
+          <p class="mt-1 text-sm text-slate-500">Completed exits will appear here today.</p>
+        </div>
+      } @else {
+        <div class="space-y-3">
+          @for (element of exitedSessions; track element.id) {
+            <article class="mobile-session-card">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <p class="truncate text-xl font-bold tracking-wide text-slate-950">{{ element.plateNumber }}</p>
+                  <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ element.vehicleType | titlecase }}</p>
+                </div>
+                <span class="rounded-md border px-2 py-1 text-xs font-bold" [ngClass]="getPaymentStatusClasses(element.paymentStatus)">
+                  {{ element.paymentStatus }}
+                </span>
+              </div>
+
+              <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+                <div class="rounded-md bg-slate-50 p-3">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Exited</p>
+                  <p class="mt-1 font-semibold text-slate-900">{{ element.exitedAt | date:'h:mm a' }}</p>
+                </div>
+                <div class="rounded-md bg-slate-50 p-3">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Fee</p>
+                  <p class="mt-1 font-semibold text-slate-900">{{ element.parkingFee | peso }}</p>
+                </div>
+                <div class="rounded-md bg-slate-50 p-3">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Duration</p>
+                  <p class="mt-1 font-semibold text-slate-900">{{ formatMinutes(element.durationMinutes ?? null) }}</p>
+                </div>
+                <div class="rounded-md bg-slate-50 p-3">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Rate</p>
+                  <p class="mt-1 font-semibold text-slate-900">{{ element.rateType | titlecase }}</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                (click)="handleRetryExitPrint(element.id)"
+                class="touch-action mt-3 w-full border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+              >
+                <lucide-angular [img]="Printer" class="h-4 w-4"></lucide-angular>
+                Retry Exit Print
+              </button>
+            </article>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="hidden w-full overflow-x-auto md:block">
+      <table cdk-table [dataSource]="sessionManagers.exited.dataSource" class="w-full min-w-[1050px] border-collapse">
+        <ng-container cdkColumnDef="vehicleType">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head w-20"></th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell">
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-full border"
+              [ngClass]="{
+                'bg-emerald-50 border-emerald-200 text-emerald-700': element.vehicleType === 'CAR',
+                'bg-sky-50 border-sky-200 text-sky-700': element.vehicleType === 'MOTORCYCLE',
+                'bg-amber-50 border-amber-200 text-amber-700': element.vehicleType === 'TRUCK'
+              }"
+            >
+              @if (element.vehicleType == 'CAR') {
+                <lucide-angular [img]="Car" class="h-5 w-5"></lucide-angular>
+              } @else if (element.vehicleType == 'MOTORCYCLE') {
+                <lucide-angular [img]="Motorbike" class="h-5 w-5"></lucide-angular>
+              } @else {
+                <lucide-angular [img]="Truck" class="h-5 w-5"></lucide-angular>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="rateType">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-left">Rate</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell">
+            <div class="session-pill" [ngClass]="getRateTypeClasses(element.rateType)">
+              <span>{{ element.rateType | titlecase }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="plateNumber">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-left">Plate</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell text-base font-bold tracking-wide text-slate-900">{{ element.plateNumber }}</td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="enteredAt">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-left">Entered</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell whitespace-nowrap">
+            {{ element.enteredAt | date:'MMM d, h:mm a' }}
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="exitedAt">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-left">Exited</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell whitespace-nowrap">
+            {{ element.exitedAt | date:'MMM d, h:mm a' }}
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="duration">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-left">Duration</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell">{{ formatMinutes(element.durationMinutes ?? null) }}</td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="fee">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-left">Fee</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell font-semibold text-slate-900">{{ element.parkingFee | peso }}</td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="status">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-left">Status</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell">
+            <span class="rounded-md border px-3 py-1.5 text-xs font-bold" [ngClass]="getPaymentStatusClasses(element.paymentStatus)">
+              {{ element.paymentStatus }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container cdkColumnDef="actions">
+          <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-right">Actions</th>
+          <td cdk-cell *cdkCellDef="let element" class="parking-table-cell text-right">
+            <button type="button" class="table-action border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100" (click)="handleRetryExitPrint(element.id)">
+              <lucide-angular [img]="Printer" class="h-4 w-4"></lucide-angular>
+              Retry Print
+            </button>
+          </td>
+        </ng-container>
+
+        <tr cdk-header-row *cdkHeaderRowDef="EXITED_SESSION_COLUMNS" class="bg-slate-900"></tr>
+        <tr cdk-row *cdkRowDef="let row; columns: EXITED_SESSION_COLUMNS;" class="border-b border-slate-100 transition hover:bg-emerald-50"></tr>
+      </table>
+
+      <mat-paginator 
+        #exitedSessionsPaginator
+        [pageSizeOptions]="[5, 10, 25, 100]" 
+        aria-label="Select page of exited sessions">
+      </mat-paginator>
+    </div>
+  </section>
+
+  <div class="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
+    <div class="parking-summary-card">
+      <div>
+        <p class="parking-stat-label">Revenue Today</p>
+        <p class="parking-stat-value">{{ stats?.revenueToday ?? 0 | peso }}</p>
+      </div>
+      <img src="/images/icons/revenue.png" alt="Revenue Icon" class="h-14">
+    </div>
+
+    <div class="parking-summary-card">
+      <div>
+        <p class="parking-stat-label">Currently Parked</p>
+        <p class="parking-stat-value">{{ activeSessions.length }} Vehicles</p>
+      </div>
+      <img src="/images/icons/parked.png" alt="Parked Icon" class="h-14">
+    </div>
+
+    <div class="parking-summary-card">
+      <div>
+        <p class="parking-stat-label">Total Entries Today</p>
+        <p class="parking-stat-value">{{ stats?.totalEntriesToday ?? 0 }}</p>
+      </div>
+      <img src="/images/icons/entries.png" alt="Entries Icon" class="h-14">
+    </div>
   </div>
 </section>
