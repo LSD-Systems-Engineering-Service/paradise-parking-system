@@ -14,6 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
 
 import { ParkingService } from './services/parking.service';
+import { PrinterStatusService } from '../../core/services/printer-status.service';
 import { QueryState } from '../../core/models/graphql-response.model';
 import { ParkingSession } from './models/parking-session.model';
 
@@ -82,6 +83,7 @@ export class Parking {
   @ViewChild('exitedSessionsPaginator') exitedSessionsPaginator!: MatPaginator;
 
   private parkingService = inject(ParkingService);
+  protected printer = inject(PrinterStatusService);
   private destroyRef = inject(DestroyRef);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
@@ -127,6 +129,18 @@ export class Parking {
     this.loadSessions('ACTIVE');
     this.loadSessions('EXITED');
     this.fetchParkingStatistics();
+
+    // Surface the real print outcome reported by the H10S device (post-ack).
+    this.printer.printResult$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        this.snackBar.open(
+          result.ok
+            ? PARKING_MESSAGES.PRINT_SUCCESS
+            : `Print failed: ${result.error ?? 'unknown error'}`,
+          'Close',
+        );
+      });
   }
 
   ngAfterViewInit() {
@@ -218,8 +232,8 @@ export class Parking {
 
   handleRetryEntryPrint(sessionId: string): void {
     this.parkingService.retryPrintEntryTicket(sessionId).subscribe({
-      next: (response) => {
-        this.snackBar.open(PARKING_MESSAGES.PRINT_SUCCESS, 'Close');
+      next: () => {
+        this.snackBar.open(PARKING_MESSAGES.PRINT_SENDING, 'Close');
       },
       error: (error) => {
         console.log('Print Service not available', error)
@@ -230,8 +244,8 @@ export class Parking {
 
   handleRetryExitPrint(sessionId: string): void {
     this.parkingService.retryPrintExitTicket(sessionId).subscribe({
-      next: (response) => {
-        this.snackBar.open(PARKING_MESSAGES.PRINT_SUCCESS, 'Close');
+      next: () => {
+        this.snackBar.open(PARKING_MESSAGES.PRINT_SENDING, 'Close');
       },
       error: (error) => {
         console.log('Print Service not available', error)

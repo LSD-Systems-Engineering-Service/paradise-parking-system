@@ -11,13 +11,17 @@
       </div>
     </div>
 
-    <!-- <a
-      [routerLink]="['/parking/exit-scan']"
-      class="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-slate-900 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800"
+    <div
+      class="inline-flex items-center gap-2 self-start rounded-full border px-3.5 py-2 text-sm font-semibold shadow-sm sm:self-auto"
+      [ngClass]="printer.online()
+        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+        : 'border-slate-200 bg-slate-50 text-slate-500'"
+      [title]="printer.online() ? 'H10S printer connected' : 'No printer connected — start the printer app on the H10S'"
     >
-      <lucide-angular [img]="ScanQrCode" class="h-5 w-5"></lucide-angular>
-      Scan Exit QR
-    </a> -->
+      <span class="h-2.5 w-2.5 rounded-full" [ngClass]="printer.online() ? 'bg-emerald-500' : 'bg-slate-400'"></span>
+      <lucide-angular [img]="Printer" class="h-4 w-4"></lucide-angular>
+      {{ printer.online() ? 'Printer Online' : 'Printer Offline' }}
+    </div>
   </div>
 
   <app-parking-entry-form></app-parking-entry-form>
@@ -149,7 +153,9 @@
                 <button
                   type="button"
                   (click)="handleRetryEntryPrint(element.id)"
-                  class="touch-action border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+                  [disabled]="!printer.online()"
+                  [title]="printer.online() ? 'Print entry ticket' : 'Printer offline'"
+                  class="touch-action border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-50"
                 >
                   <lucide-angular [img]="Printer" class="h-4 w-4"></lucide-angular>
                   Print
@@ -230,7 +236,7 @@
                 <lucide-angular [img]="LogOut" class="h-4 w-4"></lucide-angular>
                 Exit
               </button>
-              <button type="button" class="table-action border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100" (click)="handleRetryEntryPrint(element.id)">
+              <button type="button" class="table-action border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-50" (click)="handleRetryEntryPrint(element.id)" [disabled]="!printer.online()" [title]="printer.online() ? 'Print entry ticket' : 'Printer offline'">
                 <lucide-angular [img]="Printer" class="h-4 w-4"></lucide-angular>
                 Retry Print
               </button>
@@ -328,7 +334,9 @@
               <button
                 type="button"
                 (click)="handleRetryExitPrint(element.id)"
-                class="touch-action mt-3 w-full border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+                [disabled]="!printer.online()"
+                [title]="printer.online() ? 'Print exit receipt' : 'Printer offline'"
+                class="touch-action mt-3 w-full border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-50"
               >
                 <lucide-angular [img]="Printer" class="h-4 w-4"></lucide-angular>
                 Retry Exit Print
@@ -413,7 +421,7 @@
         <ng-container cdkColumnDef="actions">
           <th cdk-header-cell *cdkHeaderCellDef class="parking-table-head text-right">Actions</th>
           <td cdk-cell *cdkCellDef="let element" class="parking-table-cell text-right">
-            <button type="button" class="table-action border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100" (click)="handleRetryExitPrint(element.id)">
+            <button type="button" class="table-action border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-50" (click)="handleRetryExitPrint(element.id)" [disabled]="!printer.online()" [title]="printer.online() ? 'Print exit receipt' : 'Printer offline'">
               <lucide-angular [img]="Printer" class="h-4 w-4"></lucide-angular>
               Retry Print
             </button>

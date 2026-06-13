@@ -46,6 +46,7 @@
     "lucide-angular": "^0.562.0",
     "ngx-echarts": "^21.0.0",
     "rxjs": "~7.8.0",
+    "socket.io-client": "^4.8.3",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
